@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FLR Fitter Schedule</title>
+<meta name="description" content="Who's free, who's working and which jobs still need a fitter — the next two weeks of the FLR Work Programme.">
+<meta name="theme-color" content="#F3F5F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1418" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Fitters">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@600;700&display=swap">
+<style>
+/* ---------- tokens ---------- */
+:root {
+  --bg: #F3F5F7;
+  --surface: #FFFFFF;
+  --surface-2: #E9EDF1;
+  --ink: #14202B;
+  --ink-2: #5A6875;
+  --line: #D6DCE2;
+  --accent: #1B5E9E;
+  --accent-ink: #FFFFFF;
+  --free: #1E8E4E;      --free-bg: #E3F4EA;
+  --busy: #2457B8;      --busy-bg: #E4ECFA;
+  --off: #6B7480;       --off-bg: #ECEEF1;
+  --alert: #C8321C;     --alert-bg: #FBE7E3;
+  --flag: #B7791F;      --flag-bg: #FCF1DC;
+  --shadow: 0 1px 2px rgba(20,32,43,.06), 0 4px 12px rgba(20,32,43,.05);
+  --radius: 10px;
+  --font-ui: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-head: "Barlow Semi Condensed", "Barlow", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1418; --surface: #182028; --surface-2: #212B35;
+    --ink: #EEF2F5; --ink-2: #97A4B0; --line: #2B3640;
+    --accent: #6FB1F0; --accent-ink: #0F1418;
+    --free: #5DD08A; --free-bg: #173425;
+    --busy: #8AB4F8; --busy-bg: #1B2A47;
+    --off: #A3ADB8; --off-bg: #262E37;
+    --alert: #FF7A61; --alert-bg: #46201A;
+    --flag: #E6B45A; --flag-bg: #3D2F14;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1418; --surface: #182028; --surface-2: #212B35;
+  --ink: #EEF2F5; --ink-2: #97A4B0; --line: #2B3640;
+  --accent: #6FB1F0; --accent-ink: #0F1418;
+  --free: #5DD08A; --free-bg: #173425;
+  --busy: #8AB4F8; --busy-bg: #1B2A47;
+  --off: #A3ADB8; --off-bg: #262E37;
+  --alert: #FF7A61; --alert-bg: #46201A;
+  --flag: #E6B45A; --flag-bg: #3D2F14;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.3);
+  color-scheme: dark;
+}
+
+/* ---------- base ---------- */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-ui); font-size: 17px; line-height: 1.35;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+}
+button, select, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+[hidden] { display: none !important; }
+
+/* ---------- header ---------- */
+.top {
+  position: sticky; top: 0; z-index: 20; background: var(--bg);
+  padding: calc(10px + env(safe-area-inset-top)) 16px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.top-row { display: flex; align-items: center; gap: 10px; }
+.brand { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.brand h1 { font-family: var(--font-head); font-weight: 700; font-size: 22px; margin: 0; letter-spacing: .01em; white-space: nowrap; line-height: 1.1; }
+.brand .sub { font-size: 13px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.icon-btn {
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line);
+  background: var(--surface); display: inline-flex; align-items: center; justify-content: center; flex: none;
+}
+.icon-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.refresh {
+  height: 44px; padding: 0 16px; border-radius: 22px; border: 0; flex: none;
+  background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 16px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.refresh svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.refresh.spinning svg { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .refresh.spinning svg { animation: none; } }
+
+.days { display: flex; gap: 6px; overflow-x: auto; margin: 10px -16px 0; padding: 2px 16px 8px; scrollbar-width: none; scroll-snap-type: x proximity; }
+.days::-webkit-scrollbar { display: none; }
+.day {
+  flex: none; width: 60px; min-height: 66px; border-radius: var(--radius); border: 1px solid var(--line);
+  background: var(--surface); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  scroll-snap-align: start; padding: 6px 2px;
+}
+.day .dow { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); }
+.day .num { font-family: var(--font-head); font-weight: 700; font-size: 22px; line-height: 1; font-variant-numeric: tabular-nums; }
+.day .mini { display: flex; gap: 4px; margin-top: 3px; }
+.day .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--free); }
+.day .dot.alert { background: var(--alert); }
+.day.weekend .dow { color: var(--flag); }
+.day.today { border-color: var(--accent); }
+.day.sel { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.day.sel .dow { color: inherit; opacity: .8; }
+
+.tabs { display: flex; gap: 4px; margin-top: 6px; background: var(--surface-2); border-radius: 12px; padding: 4px; }
+.tab { flex: 1; height: 40px; border: 0; border-radius: 9px; background: transparent; font-weight: 600; font-size: 16px; color: var(--ink-2); }
+.tab[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+
+/* ---------- content ---------- */
+main { padding: 12px 16px 0; max-width: 720px; margin: 0 auto; }
+.note { border-radius: var(--radius); padding: 12px 14px; font-size: 15px; margin-bottom: 12px; }
+.note.warn { background: var(--flag-bg); color: var(--ink); border: 1px solid var(--flag); }
+.note.err { background: var(--alert-bg); border: 1px solid var(--alert); }
+.note a, .note button.link { color: var(--accent); font-weight: 600; background: none; border: 0; padding: 0; text-decoration: underline; }
+
+.dayhead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 4px 0 10px; }
+.dayhead h2 { font-family: var(--font-head); font-size: 24px; font-weight: 700; margin: 0; text-wrap: balance; }
+.dayhead .when { font-size: 14px; color: var(--ink-2); white-space: nowrap; }
+.summary { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.chip {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 20px; height: 38px; padding: 0 14px;
+  display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 15px;
+}
+.chip b { font-family: var(--font-head); font-size: 18px; font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip .sw { width: 10px; height: 10px; border-radius: 50%; }
+.sw.free { background: var(--free); } .sw.busy { background: var(--busy); } .sw.off { background: var(--off); } .sw.alert { background: var(--alert); }
+
+.section { margin: 18px 0 8px; display: flex; align-items: baseline; gap: 8px; }
+.section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); margin: 0; font-weight: 600; }
+.section .cnt { font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.section.alert h3 { color: var(--alert); }
+
+.list { display: flex; flex-direction: column; gap: 8px; }
+.row {
+  background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
+  border-left: 5px solid var(--off); padding: 10px 12px 10px 12px; min-height: 52px;
+}
+.row.free { border-left-color: var(--free); }
+.row.busy { border-left-color: var(--busy); }
+.row.off { border-left-color: var(--off); }
+.row.alert { border-left-color: var(--alert); }
+.row-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.name { font-family: var(--font-head); font-weight: 700; font-size: 19px; line-height: 1.15; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.van { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--ink-2); background: var(--surface-2); border-radius: 5px; padding: 2px 6px; white-space: nowrap; }
+.pill { font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; border-radius: 6px; padding: 4px 8px; white-space: nowrap; }
+.pill.free { background: var(--free-bg); color: var(--free); }
+.pill.busy { background: var(--busy-bg); color: var(--busy); }
+.pill.off { background: var(--off-bg); color: var(--off); }
+.pill.alert { background: var(--alert-bg); color: var(--alert); }
+.pill.flag { background: var(--flag-bg); color: var(--flag); }
+
+.jobs { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.job {
+  display: block; text-decoration: none; color: inherit; background: var(--surface-2); border-radius: 8px; padding: 8px 10px;
+}
+.job.unassigned { background: var(--alert-bg); }
+.job.offjob { background: var(--off-bg); }
+.job.flr { background: var(--flag-bg); }
+.job .t { font-weight: 600; font-size: 16px; line-height: 1.25; overflow-wrap: anywhere; }
+.job .p { font-size: 14px; color: var(--ink-2); margin-top: 1px; overflow-wrap: anywhere; }
+.job .m { display: flex; flex-wrap: wrap; gap: 6px 10px; font-size: 13px; color: var(--ink-2); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.job .m .st { color: var(--ink); font-weight: 600; }
+.job .m .st.tbc { color: var(--flag); }
+.job .with { font-size: 13px; color: var(--ink-2); margin-top: 3px; }
+
+.jobcard { border-left-width: 5px; }
+.jobcard .name { font-size: 17px; }
+.jobcard .m { display: flex; flex-wrap: wrap; gap: 6px 10px; font-size: 13px; color: var(--ink-2); margin-top: 4px; }
+.jobcard .fit { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.jobcard .fit span { background: var(--surface-2); border-radius: 6px; padding: 3px 8px; font-size: 14px; font-weight: 500; }
+.jobcard .fit .none { background: var(--alert-bg); color: var(--alert); font-weight: 600; }
+.datehead { position: sticky; top: 0; font-family: var(--font-head); font-weight: 700; font-size: 18px; margin: 18px 0 8px; }
+.datehead:first-child { margin-top: 4px; }
+
+.fitpick { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+select, .search {
+  height: 46px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); padding: 0 12px; width: 100%; font-size: 16px;
+}
+.fitrow { display: grid; grid-template-columns: 62px 1fr; gap: 10px; align-items: start; }
+.fitrow .d { text-align: center; padding-top: 6px; }
+.fitrow .d .dow { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); }
+.fitrow .d .num { font-family: var(--font-head); font-weight: 700; font-size: 22px; line-height: 1; }
+.fitrow.weekend .d .dow { color: var(--flag); }
+.fitrow .state { display: flex; align-items: center; gap: 8px; min-height: 30px; }
+.empty { color: var(--ink-2); font-size: 15px; padding: 16px 4px; text-align: center; }
+
+.foot { text-align: center; font-size: 13px; color: var(--ink-2); margin: 24px 0 8px; }
+.foot button { background: none; border: 0; color: var(--accent); text-decoration: underline; padding: 4px; }
+
+/* sheet */
+.sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 40; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 41; background: var(--surface); border-radius: 16px 16px 0 0;
+  padding: 16px 16px calc(20px + env(safe-area-inset-bottom)); max-width: 720px; margin: 0 auto; box-shadow: 0 -8px 30px rgba(0,0,0,.2);
+}
+.sheet h2 { font-family: var(--font-head); font-size: 20px; margin: 0 0 12px; }
+.opt { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 16px; }
+.opt small { display: block; color: var(--ink-2); font-size: 13px; }
+.opt input[type="checkbox"] { width: 24px; height: 24px; flex: none; accent-color: var(--accent); }
+.seg { display: flex; gap: 4px; background: var(--surface-2); border-radius: 9px; padding: 3px; }
+.seg button { border: 0; background: transparent; border-radius: 7px; height: 34px; padding: 0 12px; font-weight: 600; color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.field { margin-top: 10px; }
+.field label { display: block; font-size: 13px; color: var(--ink-2); margin-bottom: 4px; }
+.field input { height: 46px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); padding: 0 12px; width: 100%; font-size: 16px; }
+.btn { height: 46px; border-radius: 10px; border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 600; padding: 0 18px; width: 100%; margin-top: 12px; }
+.btn.quiet { background: var(--surface-2); color: var(--ink); }
+
+@media (min-width: 600px) { .brand .sub { font-size: 14px; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-row">
+    <div class="brand">
+      <h1>Fitters</h1>
+      <span class="sub" id="status">Loading…</span>
+    </div>
+    <button class="icon-btn" id="themeBtn" aria-label="Switch theme" title="Switch theme">
+      <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A5.5 5.5 0 0 1 12.4 3.1C12.3 3 12.1 3 12 3z"/></svg>
+    </button>
+    <button class="icon-btn" id="settingsBtn" aria-label="Settings" title="Settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+    <button class="refresh" id="refreshBtn">
+      <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+      <span>Refresh</span>
+    </button>
+  </div>
+  <div class="days" id="days" role="tablist" aria-label="Pick a day"></div>
+  <div class="tabs" role="tablist" aria-label="View">
+    <button class="tab" role="tab" data-view="day" aria-selected="true">Day</button>
+    <button class="tab" role="tab" data-view="fitter" aria-selected="false">Fitter</button>
+    <button class="tab" role="tab" data-view="jobs" aria-selected="false">Jobs</button>
+  </div>
+</header>
+
+<main>
+  <div id="notice"></div>
+  <section id="viewDay"></section>
+  <section id="viewFitter" hidden></section>
+  <section id="viewJobs" hidden></section>
+  <p class="foot" id="foot"></p>
+</main>
+
+<div id="sheetBg" class="sheet-bg" hidden></div>
+<div id="sheet" class="sheet" hidden role="dialog" aria-labelledby="sheetTitle"></div>
+
+<script>
+/* ==========================================================================
+   CONFIG — change WORKER_URL to your Cloudflare Worker address
+   ========================================================================== */
+const WORKER_URL = "https://flr-fitter-schedule.billing-a77.workers.dev/?key=flr25a";
+const MONDAY_BOARD_URL = "https://flr-group-company.monday.com/boards/5094652880/pulses/";
+const DAYS_AHEAD = 14;
+
+const JOB_GROUPS = ["Scheduling Issue", "Ready to schedule", "Scheduled"];
+const COMPLETED_GROUP = "Completed";
+const FLR_GROUP = "FLR jobs";
+const LEAVE_GROUP = "Holidays, Sickness, Unavailable & Leave";
+const ROTA_GROUP = "National Holidays & Weekend Rota";
+const OFF_STATUSES = ["Annual Leave", "Not Working", "Unpaid Leave", "Unpaid Sick", "Appointments"];
+const LEAVER_RE = /^ZZ\s*le/i;
+
+/* ---------- state ---------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("flr." + k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("flr." + k, JSON.stringify(v)); } catch {} },
+};
+const settings = Object.assign({
+  includeCompleted: false,   // jobs already moved to Completed but dated in the window
+  includeRota: true,         // "Not working - Weekend Rota" marks fitters off at weekends
+  showWeekends: true,
+  showZ: true,               // ZFLR / ZSub entries on the roster
+}, store.get("settings", {}));
+let data = null;            // last payload from the worker
+let days = [];              // ["2026-09-10", ...]
+let selDay = null;
+let view = store.get("view", "day");
+let dayFilter = "all";
+let jobsFilter = store.get("jobsFilter", "all");
+let search = "";
+let selFitter = store.get("fitter", "");
+
+/* ---------- dates ---------- */
+const pad = n => String(n).padStart(2, "0");
+function londonToday() {
+  const p = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+  const g = t => p.find(x => x.type === t).value;
+  return `${g("year")}-${g("month")}-${g("day")}`;
+}
+function addDays(iso, n) { const d = new Date(iso + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function dparts(iso) { const d = new Date(iso + "T12:00:00Z"); return { dow: DOW[d.getUTCDay()], num: d.getUTCDate(), mon: MON[d.getUTCMonth()], wk: d.getUTCDay() === 0 || d.getUTCDay() === 6 }; }
+function longDate(iso) { const p = dparts(iso); return `${p.dow} ${p.num} ${p.mon}`; }
+function rangeLabel(from, to) {
+  const a = dparts(from), b = dparts(to);
+  if (from === to) return `${a.dow} ${a.num} ${a.mon}`;
+  if (a.mon === b.mon) return `${a.num}–${b.num} ${a.mon}`;
+  return `${a.num} ${a.mon} – ${b.num} ${b.mon}`;
+}
+function overlaps(e, iso) { return e.from <= iso && e.to >= iso; }
+
+/* ---------- roster ---------- */
+function parseLabel(label) {
+  let kind = "fitter", s = label;
+  if (/^ZFLR\s*-\s*/i.test(s)) { kind = "flr"; s = s.replace(/^ZFLR\s*-\s*/i, ""); }
+  else if (/^ZSub\s*-\s*/i.test(s)) { kind = "sub"; s = s.replace(/^ZSub\s*-\s*/i, ""); }
+  else if (LEAVER_RE.test(s)) { kind = "left"; s = s.replace(/^ZZ\s*le\w*\s*-\s*/i, ""); }
+  const i = s.indexOf(" - ");
+  const name = i > 0 ? s.slice(0, i).trim() : s.trim();
+  const van = i > 0 ? s.slice(i + 3).trim() : "";
+  return { label, name, van, kind };
+}
+function roster() {
+  if (!data) return [];
+  const order = { fitter: 0, flr: 1, sub: 2 };
+  return data.roster
+    .filter(r => !r.deactivated && !LEAVER_RE.test(r.label))
+    .map(r => parseLabel(r.label))
+    .filter(r => settings.showZ || r.kind === "fitter")
+    .sort((a, b) => order[a.kind] - order[b.kind] || a.name.localeCompare(b.name));
+}
+
+/* ---------- classification ---------- */
+// kind: job | flr | off | flag | ignore
+function classify(e) {
+  const g = e.job.group;
+  if (g === LEAVE_GROUP) return "off";
+  if (g === ROTA_GROUP) return settings.includeRota ? "off" : "ignore";
+  if (g === FLR_GROUP) return "flr";
+  const isJobGroup = JOB_GROUPS.includes(g) || (settings.includeCompleted && g === COMPLETED_GROUP);
+  if (!isJobGroup) return "ignore";
+  if (e.status === "Flags") return "flag";
+  if (e.status === "Supply Only") return "ignore";
+  if (OFF_STATUSES.includes(e.status)) return "off";
+  return "job";
+}
+function entriesOn(iso) { return data ? data.entries.filter(e => overlaps(e, iso)) : []; }
+
+// { state, jobs, flr, off, flags } for one fitter label on one day
+function fitterDay(label, iso) {
+  const r = { state: "free", jobs: [], flr: [], off: [], flags: [], clash: false };
+  for (const e of entriesOn(iso)) {
+    if (!e.fitters.includes(label)) continue;
+    const k = classify(e);
+    if (k === "job") r.jobs.push(e);
+    else if (k === "flr") r.flr.push(e);
+    else if (k === "off") r.off.push(e);
+    else if (k === "flag") r.flags.push(e);
+  }
+  if (r.jobs.length || r.flr.length) { r.state = "busy"; r.clash = r.off.length > 0; }
+  else if (r.off.length) r.state = "off";
+  return r;
+}
+function dayStats(iso) {
+  const s = { free: 0, busy: 0, off: 0, unassigned: 0 };
+  for (const f of roster()) s[fitterDay(f.label, iso).state]++;
+  s.unassigned = entriesOn(iso).filter(e => classify(e) === "job" && e.fitters.length === 0).length;
+  return s;
+}
+
+/* ---------- rendering helpers ---------- */
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const h = (strings, ...vals) => strings.reduce((a, s, i) => a + s + (i < vals.length ? vals[i] : ""), "");
+function shortName(label) { return parseLabel(label).name; }
+function statusChip(st) {
+  if (!st || st === "Default" || st === "Scheduled") return "";
+  const cls = st === "TBC" ? "st tbc" : "st";
+  return `<span class="${cls}">${esc(st)}</span>`;
+}
+function jobLink(e) { return e.job.id ? MONDAY_BOARD_URL + e.job.id : "#"; }
+function jobBlock(e, opts = {}) {
+  const k = classify(e);
+  const cls = k === "off" ? "offjob" : k === "flr" ? "flr" : (e.fitters.length === 0 ? "unassigned" : "");
+  const others = opts.me ? e.fitters.filter(f => f !== opts.me).map(shortName) : [];
+  const showParent = e.job.name && e.job.name.trim() !== e.name.trim();
+  return h`<a class="job ${cls}" href="${jobLink(e)}" target="_blank" rel="noopener">
+    <div class="t">${esc(e.name)}</div>
+    ${showParent ? `<div class="p">${esc(e.job.name)}</div>` : ""}
+    <div class="m">
+      <span>${esc(rangeLabel(e.from, e.to))}</span>
+      ${e.job.postcode ? `<span>${esc(e.job.postcode)}</span>` : ""}
+      ${e.job.wfm ? `<span>WFM ${esc(e.job.wfm)}</span>` : ""}
+      ${k === "flr" ? `<span class="st">FLR</span>` : statusChip(e.status)}
+    </div>
+    ${others.length ? `<div class="with">with ${esc(others.join(", "))}</div>` : ""}
+  </a>`;
+}
+
+/* ---------- Day view ---------- */
+function renderDays() {
+  const el = document.getElementById("days");
+  el.innerHTML = days.filter(d => settings.showWeekends || !dparts(d).wk).map(d => {
+    const p = dparts(d), s = data ? dayStats(d) : null;
+    const cls = ["day", p.wk ? "weekend" : "", d === days[0] ? "today" : "", d === selDay ? "sel" : ""].join(" ");
+    const mini = s ? `<div class="mini" aria-hidden="true">${s.unassigned ? '<span class="dot alert"></span>' : ""}${s.free ? '<span class="dot"></span>' : ""}</div>` : "";
+    return `<button class="${cls}" role="tab" aria-selected="${d === selDay}" data-day="${d}" aria-label="${longDate(d)}${s ? `, ${s.free} free, ${s.unassigned} need a fitter` : ""}">
+      <span class="dow">${p.dow}</span><span class="num">${p.num}</span>${mini}</button>`;
+  }).join("");
+  const sel = el.querySelector(".sel");
+  if (sel) sel.scrollIntoView({ block: "nearest", inline: "center", behavior: "instant" });
+}
+
+function renderDay() {
+  const el = document.getElementById("viewDay");
+  if (!data) { el.innerHTML = ""; return; }
+  const iso = selDay, s = dayStats(iso);
+  const rel = iso === days[0] ? "Today" : iso === days[1] ? "Tomorrow" : "";
+  const q = search.trim().toLowerCase();
+  const matches = f => !q || f.name.toLowerCase().includes(q) || f.label.toLowerCase().includes(q);
+
+  const unassigned = entriesOn(iso).filter(e => classify(e) === "job" && e.fitters.length === 0)
+    .filter(e => !q || e.name.toLowerCase().includes(q) || e.job.name.toLowerCase().includes(q));
+  const rows = roster().map(f => ({ f, d: fitterDay(f.label, iso) })).filter(x => matches(x.f));
+  const groups = [
+    { key: "busy", title: "Working", cls: "busy" },
+    { key: "free", title: "Free", cls: "free" },
+    { key: "off", title: "Unavailable", cls: "off" },
+  ];
+
+  let html = h`
+    <div class="dayhead"><h2>${longDate(iso)}</h2><span class="when">${rel}</span></div>
+    <div class="summary" role="group" aria-label="Filter fitters">
+      ${["all", "free", "busy", "off"].map(k => {
+        const label = k === "all" ? "All" : k === "free" ? "Free" : k === "busy" ? "Working" : "Off";
+        const n = k === "all" ? rows.length : s[k];
+        return `<button class="chip" data-filter="${k}" aria-pressed="${dayFilter === k}">${k !== "all" ? `<span class="sw ${k}"></span>` : ""}${label} <b>${n}</b></button>`;
+      }).join("")}
+      ${s.unassigned ? `<a class="chip" href="#needs" style="color:var(--alert);border-color:var(--alert)"><span class="sw alert"></span>Needs fitter <b>${s.unassigned}</b></a>` : ""}
+    </div>
+    <input class="search" id="searchDay" type="search" placeholder="Search fitter or job" value="${esc(search)}" aria-label="Search">`;
+
+  if (unassigned.length && (dayFilter === "all" || dayFilter === "busy")) {
+    html += `<div class="section alert" id="needs"><h3>Needs a fitter</h3><span class="cnt">${unassigned.length}</span></div><div class="list">`;
+    html += unassigned.map(e => `<div class="row alert">${jobBlock(e)}</div>`).join("");
+    html += `</div>`;
+  }
+  for (const g of groups) {
+    if (dayFilter !== "all" && dayFilter !== g.key) continue;
+    const list = rows.filter(x => x.d.state === g.key);
+    if (!list.length) continue;
+    html += `<div class="section"><h3>${g.title}</h3><span class="cnt">${list.length}</span></div><div class="list">`;
+    for (const { f, d } of list) {
+      const kindChip = f.kind === "flr" ? `<span class="van">FLR</span>` : f.kind === "sub" ? `<span class="van">Sub</span>` : "";
+      const pill = d.clash ? `<span class="pill alert">Clash</span>` : d.state === "busy" ? `<span class="pill busy">Working</span>` : d.state === "off" ? `<span class="pill off">Off</span>` : `<span class="pill free">Free</span>`;
+      const flags = d.flags.map(x => `<span class="pill flag">${esc(x.name)}</span>`).join(" ");
+      const items = [...d.jobs, ...d.flr, ...d.off];
+      html += h`<div class="row ${g.cls}">
+        <div class="row-head"><span class="name">${esc(f.name)}</span>${f.van ? `<span class="van">${esc(f.van)}</span>` : ""}${kindChip}${pill}</div>
+        ${flags ? `<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">${flags}</div>` : ""}
+        ${items.length ? `<div class="jobs">${items.map(e => jobBlock(e, { me: f.label })).join("")}</div>` : ""}
+      </div>`;
+    }
+    html += `</div>`;
+  }
+  if (!rows.length && !unassigned.length) html += `<p class="empty">Nothing matches.</p>`;
+  el.innerHTML = html;
+  el.querySelectorAll(".chip[data-filter]").forEach(b => b.addEventListener("click", () => { dayFilter = b.dataset.filter; renderDay(); }));
+  const si = el.querySelector("#searchDay");
+  si.addEventListener("input", () => { search = si.value; renderDay(); const n = el.querySelector("#searchDay"); n.focus(); n.setSelectionRange(n.value.length, n.value.length); });
+}
+
+/* ---------- Fitter view ---------- */
+function renderFitter() {
+  const el = document.getElementById("viewFitter");
+  if (!data) { el.innerHTML = ""; return; }
+  const list = roster();
+  if (!list.some(f => f.label === selFitter)) selFitter = list[0] ? list[0].label : "";
+  let html = h`<div class="fitpick"><select id="fitterSel" aria-label="Choose a fitter">
+    ${list.map(f => `<option value="${esc(f.label)}" ${f.label === selFitter ? "selected" : ""}>${esc(f.name)}${f.van ? " · " + esc(f.van) : ""}${f.kind === "flr" ? " (FLR)" : f.kind === "sub" ? " (Sub)" : ""}</option>`).join("")}
+  </select></div><div class="list">`;
+  for (const iso of days) {
+    const p = dparts(iso);
+    if (!settings.showWeekends && p.wk) continue;
+    const d = fitterDay(selFitter, iso);
+    const items = [...d.jobs, ...d.flr, ...d.off];
+    const pill = d.clash ? `<span class="pill alert">Clash</span>` : d.state === "busy" ? `<span class="pill busy">Working</span>` : d.state === "off" ? `<span class="pill off">Off</span>` : `<span class="pill free">Free</span>`;
+    html += h`<div class="row ${d.state} fitrow ${p.wk ? "weekend" : ""}" style="border-left-color:var(--${d.clash ? "alert" : d.state})">
+      <div class="d"><div class="dow">${p.dow}</div><div class="num">${p.num}</div><div class="dow">${p.mon}</div></div>
+      <div>
+        <div class="state">${pill}${iso === days[0] ? `<span class="van">Today</span>` : ""}${d.flags.map(x => `<span class="pill flag">${esc(x.name)}</span>`).join("")}</div>
+        ${items.length ? `<div class="jobs">${items.map(e => jobBlock(e, { me: selFitter })).join("")}</div>` : ""}
+      </div>
+    </div>`;
+  }
+  el.innerHTML = html + `</div>`;
+  el.querySelector("#fitterSel").addEventListener("change", ev => { selFitter = ev.target.value; store.set("fitter", selFitter); renderFitter(); });
+}
+
+/* ---------- Jobs view ---------- */
+function renderJobs() {
+  const el = document.getElementById("viewJobs");
+  if (!data) { el.innerHTML = ""; return; }
+  const last = days[days.length - 1];
+  const q = search.trim().toLowerCase();
+  let list = data.entries.filter(e => classify(e) === "job" && e.from <= last && e.to >= days[0]);
+  if (jobsFilter === "unassigned") list = list.filter(e => e.fitters.length === 0);
+  if (q) list = list.filter(e => (e.name + " " + e.job.name + " " + e.fitters.join(" ") + " " + e.job.postcode).toLowerCase().includes(q));
+  const nUn = data.entries.filter(e => classify(e) === "job" && e.from <= last && e.to >= days[0] && e.fitters.length === 0).length;
+
+  let html = h`<div class="summary">
+      <button class="chip" data-jf="all" aria-pressed="${jobsFilter === "all"}">All jobs <b>${list.length}</b></button>
+      <button class="chip" data-jf="unassigned" aria-pressed="${jobsFilter === "unassigned"}" style="${nUn ? "color:var(--alert);border-color:var(--alert)" : ""}"><span class="sw alert"></span>Needs fitter <b>${nUn}</b></button>
+    </div>
+    <input class="search" id="searchJobs" type="search" placeholder="Search job, postcode or fitter" value="${esc(search)}" aria-label="Search">`;
+  // group by start date (jobs already running show under today)
+  const byDate = new Map();
+  for (const e of list) { const k = e.from < days[0] ? days[0] : e.from; if (!byDate.has(k)) byDate.set(k, []); byDate.get(k).push(e); }
+  html += `<div class="list">`;
+  for (const [iso, items] of [...byDate.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+    html += `<div class="datehead">${longDate(iso)}${iso === days[0] ? ` <span class="van">Today &amp; in progress</span>` : ""}</div>`;
+    for (const e of items) {
+      const un = e.fitters.length === 0;
+      const showParent = e.job.name && e.job.name.trim() !== e.name.trim();
+      html += h`<a class="row jobcard ${un ? "alert" : "busy"}" href="${jobLink(e)}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block">
+        <div class="row-head"><span class="name">${esc(e.name)}</span>${un ? `<span class="pill alert">Needs fitter</span>` : ""}</div>
+        ${showParent ? `<div class="p" style="font-size:14px;color:var(--ink-2)">${esc(e.job.name)}</div>` : ""}
+        <div class="m"><span>${esc(rangeLabel(e.from, e.to))}</span>${e.job.postcode ? `<span>${esc(e.job.postcode)}</span>` : ""}${e.job.wfm ? `<span>WFM ${esc(e.job.wfm)}</span>` : ""}<span>${esc(e.job.group)}</span>${statusChip(e.status)}</div>
+        <div class="fit">${un ? `<span class="none">No fitter assigned</span>` : e.fitters.map(f => `<span>${esc(shortName(f))}</span>`).join("")}</div>
+      </a>`;
+    }
+  }
+  html += `</div>`;
+  if (!list.length) html += `<p class="empty">No jobs match.</p>`;
+  el.innerHTML = html;
+  el.querySelectorAll(".chip[data-jf]").forEach(b => b.addEventListener("click", () => { jobsFilter = b.dataset.jf; store.set("jobsFilter", jobsFilter); renderJobs(); }));
+  const si = el.querySelector("#searchJobs");
+  si.addEventListener("input", () => { search = si.value; renderJobs(); const n = el.querySelector("#searchJobs"); n.focus(); n.setSelectionRange(n.value.length, n.value.length); });
+}
+
+/* ---------- views / chrome ---------- */
+function renderAll() {
+  renderDays();
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.view === view)));
+  document.getElementById("viewDay").hidden = view !== "day";
+  document.getElementById("viewFitter").hidden = view !== "fitter";
+  document.getElementById("viewJobs").hidden = view !== "jobs";
+  document.getElementById("days").style.display = view === "day" ? "" : "none";
+  if (view === "day") renderDay(); else if (view === "fitter") renderFitter(); else renderJobs();
+  const foot = document.getElementById("foot");
+  foot.innerHTML = data
+    ? `Work Programme · ${data.entries.length} scheduled entries from ${esc(data.from)} · <button id="changeKey">Change passcode</button>`
+    : "";
+  const ck = document.getElementById("changeKey");
+  if (ck) ck.addEventListener("click", () => openSheet("key"));
+}
+function setStatus(txt) { document.getElementById("status").textContent = txt; }
+function timeAgo(iso) {
+  const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (m < 1) return "just now"; if (m < 60) return `${m} min ago`;
+  const hh = Math.round(m / 60); return hh < 24 ? `${hh} h ago` : `${Math.round(hh / 24)} d ago`;
+}
+function notice(html, cls) { document.getElementById("notice").innerHTML = html ? `<div class="note ${cls}">${html}</div>` : ""; }
+
+/* ---------- data ---------- */
+function workerBase() {
+  const qp = new URLSearchParams(location.search).get("worker");
+  if (qp) store.set("workerUrl", qp);
+  return (store.get("workerUrl", "") || WORKER_URL).replace(/\/$/, "");
+}
+async function load(fresh) {
+  const key = store.get("key", "");
+  if (!key) { openSheet("key"); return; }
+  const btn = document.getElementById("refreshBtn");
+  btn.classList.add("spinning"); btn.disabled = true; setStatus("Updating…");
+  try {
+    const today = londonToday();
+    const res = await fetch(`${workerBase()}/schedule?from=${today}${fresh ? "&fresh=1" : ""}`, { headers: { "X-App-Key": key }, cache: "no-store" });
+    if (res.status === 401) { store.set("key", ""); notice("The passcode was not accepted. <button class='link' id='retryKey'>Enter it again</button>", "err"); document.getElementById("retryKey").onclick = () => openSheet("key"); setStatus("Not signed in"); return; }
+    if (!res.ok) { let msg = `Error ${res.status}`; try { msg = (await res.json()).error || msg; } catch {} throw new Error(msg); }
+    data = await res.json();
+    data.fetchedAt = new Date().toISOString();
+    store.set("cache", data);
+    buildDays(today);
+    notice("");
+    setStatus(`Updated ${timeAgo(data.fetchedAt)}`);
+    renderAll();
+  } catch (err) {
+    const cached = store.get("cache", null);
+    if (cached && !data) { data = cached; buildDays(londonToday()); renderAll(); }
+    notice(`Couldn't reach the schedule (${esc(err.message)}). ${data ? `Showing data from ${timeAgo(data.fetchedAt)}.` : ""} <button class="link" id="retryLoad">Try again</button>`, "warn");
+    document.getElementById("retryLoad").onclick = () => load(true);
+    setStatus(data ? `Offline · ${timeAgo(data.fetchedAt)}` : "Offline");
+  } finally {
+    btn.classList.remove("spinning"); btn.disabled = false;
+  }
+}
+function buildDays(today) {
+  days = Array.from({ length: DAYS_AHEAD }, (_, i) => addDays(today, i));
+  if (!selDay || !days.includes(selDay)) selDay = days[0];
+}
+
+/* ---------- sheet (passcode / settings) ---------- */
+function openSheet(kind) {
+  const sh = document.getElementById("sheet"), bg = document.getElementById("sheetBg");
+  if (kind === "key") {
+    sh.innerHTML = `<h2 id="sheetTitle">Team passcode</h2>
+      <p style="margin:0 0 4px;color:var(--ink-2);font-size:15px">Ask the office for the passcode. It's saved on this phone so you only enter it once.</p>
+      <div class="field"><label for="keyInput">Passcode</label><input id="keyInput" type="password" autocomplete="current-password" inputmode="text"></div>
+      <button class="btn" id="keySave">Open schedule</button>`;
+    sh.querySelector("#keySave").onclick = () => { const v = sh.querySelector("#keyInput").value.trim(); if (!v) return; store.set("key", v); closeSheet(); load(true); };
+    sh.querySelector("#keyInput").addEventListener("keydown", e => { if (e.key === "Enter") sh.querySelector("#keySave").click(); });
+  } else {
+    const opt = (id, label, small) => `<label class="opt"><span>${label}<small>${small}</small></span><input type="checkbox" id="${id}" ${settings[id] ? "checked" : ""}></label>`;
+    sh.innerHTML = `<h2 id="sheetTitle">Settings</h2>
+      <div class="opt" style="border-top:0"><span>Theme</span><div class="seg" id="themeSeg">
+        <button data-t="">Auto</button><button data-t="light">Light</button><button data-t="dark">Dark</button></div></div>
+      ${opt("showWeekends", "Show weekends", "Saturday and Sunday in the day strip and fitter view")}
+      ${opt("includeRota", "Use the weekend rota", "Fitters on 'Not working – Weekend Rota' show as Off that weekend")}
+      ${opt("showZ", "Show FLR staff and subcontractors", "ZFLR and ZSub entries get their own free/busy row")}
+      ${opt("includeCompleted", "Include jobs already marked Completed", "Jobs moved to Completed but dated in the next two weeks count as work")}
+      <button class="btn quiet" id="sheetClose">Done</button>`;
+    const cur = store.get("theme", "");
+    sh.querySelectorAll("#themeSeg button").forEach(b => { b.setAttribute("aria-pressed", String(b.dataset.t === cur)); b.onclick = () => { applyTheme(b.dataset.t); sh.querySelectorAll("#themeSeg button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); }; });
+    sh.querySelectorAll("input[type=checkbox]").forEach(c => c.addEventListener("change", () => { settings[c.id] = c.checked; store.set("settings", settings); if (data) renderAll(); }));
+    sh.querySelector("#sheetClose").onclick = closeSheet;
+  }
+  sh.hidden = false; bg.hidden = false;
+  bg.onclick = () => { if (kind === "key" && !store.get("key", "")) return; closeSheet(); };
+  const first = sh.querySelector("input, button"); if (first) first.focus();
+}
+function closeSheet() { document.getElementById("sheet").hidden = true; document.getElementById("sheetBg").hidden = true; }
+
+/* ---------- theme ---------- */
+function applyTheme(t) {
+  store.set("theme", t || "");
+  if (t) document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme");
+}
+function toggleTheme() {
+  const dark = document.documentElement.getAttribute("data-theme") === "dark" ||
+    (!document.documentElement.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+  applyTheme(dark ? "light" : "dark");
+}
+
+/* ---------- boot ---------- */
+applyTheme(store.get("theme", ""));
+document.getElementById("refreshBtn").addEventListener("click", () => load(true));
+document.getElementById("themeBtn").addEventListener("click", toggleTheme);
+document.getElementById("settingsBtn").addEventListener("click", () => openSheet("settings"));
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => { view = t.dataset.view; store.set("view", view); search = ""; renderAll(); }));
+document.getElementById("days").addEventListener("click", ev => { const b = ev.target.closest("[data-day]"); if (!b) return; selDay = b.dataset.day; renderDays(); renderDay(); });
+document.addEventListener("visibilitychange", () => { if (!document.hidden && data && Date.now() - new Date(data.fetchedAt).getTime() > 10 * 60000) load(false); });
+setInterval(() => { if (data) setStatus(`Updated ${timeAgo(data.fetchedAt)}`); }, 60000);
+
+(function start() {
+  if (window.FLR_EMBEDDED) {           // preview build: a snapshot baked into the page, no worker
+    data = window.FLR_EMBEDDED; data.fetchedAt = data.generatedAt;
+    buildDays(data.from); renderAll(); setStatus(`Snapshot ${timeAgo(data.fetchedAt)}`);
+    notice(`Preview using a snapshot of the board taken ${esc(new Date(data.generatedAt).toLocaleString("en-GB", { timeZone: "Europe/London", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }))}. Refresh is off in this preview.`, "warn");
+    document.getElementById("refreshBtn").disabled = true;
+    return;
+  }
+  const cached = store.get("cache", null);
+  if (cached) { data = cached; buildDays(londonToday()); renderAll(); setStatus(`Updated ${timeAgo(data.fetchedAt)}`); }
+  load(false);
+})();
+</script>
+</body>
+</html>
