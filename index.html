@@ -271,7 +271,7 @@ select, .search {
 /* ==========================================================================
    CONFIG — change WORKER_URL to your Cloudflare Worker address
    ========================================================================== */
-const WORKER_URL = "https://flr-fitter-schedule.billing-a77.workers.dev/?key=flr25a";
+const WORKER_URL = "https://flr-fitter-schedule.billing-a77.workers.dev";
 const MONDAY_BOARD_URL = "https://flr-group-company.monday.com/boards/5094652880/pulses/";
 const DAYS_AHEAD = 14;
 
@@ -289,7 +289,7 @@ const store = {
   set(k, v) { try { localStorage.setItem("flr." + k, JSON.stringify(v)); } catch {} },
 };
 const settings = Object.assign({
-  includeCompleted: false,   // jobs already moved to Completed but dated in the window
+  includeCompleted: true,    // jobs already moved to Completed but still dated in the window (keeps fitters from looking Free)
   includeRota: true,         // "Not working - Weekend Rota" marks fitters off at weekends
   showWeekends: true,
   showZ: true,               // ZFLR / ZSub entries on the roster
