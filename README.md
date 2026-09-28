@@ -1,6 +1,6 @@
 # FLR Fitter Schedule
 
-A mobile-first web app that shows, for each of the next 14 days, which fitters are **free**, **working** or **off**, what each is working on, and which jobs on the Work Programme still **need a fitter**. It reads the Monday.com *Work Programme* board (ID 5094652880) through a small Cloudflare Worker, so no Monday token ever reaches a phone.
+A mobile-first web app, in the same look as the [FLR Hub](https://flrmarketing.github.io/flr-hub/) (which links to it), that shows, for each of the next 14 days, which fitters are **free**, **working** or **off**, what each is working on, and which jobs on the Work Programme still **need a fitter**. It reads the Monday.com *Work Programme* board (ID 5094652880) through a small Cloudflare Worker, so no Monday token ever reaches a phone.
 
 ```
 Phone / browser  ──►  GitHub Pages (index.html)  ──►  Cloudflare Worker (holds the Monday token)  ──►  monday.com API
@@ -68,9 +68,9 @@ Open the link in Safari (iPhone) or Chrome (Android) → *Share* / menu → **Ad
 ## Day-to-day
 
 - **Refresh** asks the worker for fresh data (bypasses the 45-second cache). The page also refreshes itself when reopened after 10 minutes.
-- **Day** tab: pick a date from the strip. *Needs a fitter* is pinned at the top, then Working, Free and Unavailable. Chips filter; search matches fitter or job names.
+- **Day** tab: pick a date from the strip. *Needs a fitter* is pinned at the top, then Working, Free and Unavailable. The All / Free / Working / Off control filters; search matches fitter or job names.
 - **Fitter** tab: one fitter's fortnight — good for fitters bookmarking their own view (the selection is remembered).
-- **Jobs** tab: every scheduled entry in the window, grouped by start date, unassigned ones highlighted; *Needs fitter* chip shows only those.
+- **Jobs** tab: every scheduled entry in the window, grouped by start date, unassigned ones highlighted; *Needs fitter* shows only those.
 - **Settings** (cog): theme (Auto / Light / Dark), weekends, weekend rota, FLR/Sub rows, Completed jobs.
 
 ## Changing the passcode or token
