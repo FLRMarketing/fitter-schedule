@@ -374,6 +374,14 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
 .st{padding:0 6px;border-radius:5px;background:var(--fill);color:var(--ink);font-weight:600}
 .job .st{background:var(--surface);box-shadow:inset 0 0 0 var(--hair) var(--sep)}
 .st.tbc,.job .st.tbc{background:var(--gold-soft);color:var(--gold-ink);box-shadow:none}
+/* Arrivals (FLR administrators): when the fitter's van reached the site, from FleetView. Tapping one shows the job's log. */
+.arr{display:inline-flex;align-items:center;gap:5px;padding:0 7px;border-radius:999px;font-weight:600;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.arr.on{background:var(--green-soft);color:var(--green-ink)}
+.arr.on::before{content:"";width:6px;height:6px;flex:none;border-radius:50%;background:currentColor}
+.arr.done{background:var(--surface);box-shadow:inset 0 0 0 var(--hair) var(--sep);color:var(--ink-2)}
+.arr.nc{background:transparent;box-shadow:inset 0 0 0 1px var(--line-2);color:var(--ink-3);font-weight:500}
+.arr:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+@media (hover:hover){.arr:hover{filter:brightness(.96)}}
 .with{font-size:12.5px;color:var(--ink-3)}
 .go{width:15px;height:15px;flex:none;margin-top:2px;color:var(--ink-3)}
 @media (min-width:900px){
@@ -422,6 +430,10 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
 .jr-fit span.has-face{padding-left:2px}
 .jr-fit .mini{display:block;width:18px;height:18px;margin-right:6px;border-radius:50%;object-fit:cover;background:var(--ph-bg)}
 .jr-fit .none{background:var(--red-soft);color:var(--red-ink);font-weight:600}
+.jr-fit span.t-arr{display:inline-flex;align-items:center;gap:4px;margin-left:7px;padding:0;border-radius:0;background:none;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.jr-fit span.t-arr.on{color:var(--green-ink)}
+.jr-fit span.t-arr.on::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.jr-fit span.t-arr.nc{color:var(--ink-3);font-weight:500}
 .jrow .go{grid-column:2;grid-row:1;align-self:center}
 @media (max-width:899px){.jr-fit{grid-column:1}}
 @media (min-width:900px){
@@ -467,6 +479,28 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
 .switch:active::before{width:31px}
 .switch:checked:active::before{transform:translateX(16px)}
 .switch:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+/* the arrivals sheets */
+.arow{position:relative;display:grid;grid-template-columns:9px minmax(0,1fr);column-gap:12px;row-gap:1px;width:100%;padding:11px 16px;border:0;background:none;color:inherit;
+  font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background-color .15s}
+button.arow:active{background:var(--fill)}
+@media (hover:hover){button.arow:hover{background:var(--row-hover)}}
+.arow.static{cursor:default}
+.arow+.arow::before{content:"";position:absolute;top:0;left:37px;right:0;height:var(--hair);background:var(--sep)}
+.arow .dot{grid-row:1 / span 3;align-self:start;width:9px;height:9px;margin-top:5px;border-radius:50%;background:var(--ink-3)}
+.arow .dot.on{background:var(--green-ink)}
+.arow .dot.nc{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ink-3)}
+.arow b{font:600 15px/1.35 var(--font-text);letter-spacing:-.01em;overflow-wrap:anywhere}
+.arow .j,.arow .x{font-size:13px;line-height:1.4;color:var(--ink-2);overflow-wrap:anywhere}
+.arow .s{font-size:13.5px;line-height:1.4;font-weight:600;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.arow .s.on{color:var(--green-ink)}
+.arow .s.nc{font-weight:500;color:var(--ink-3)}
+.arr-meta{font-size:13px;line-height:1.4;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.arr-job{display:flex;flex-direction:column;gap:3px}
+.arr-job h3{font:600 17px/1.3 var(--font-text);letter-spacing:-.014em;overflow-wrap:anywhere}
+.arr-job p{font-size:13.5px;line-height:1.4;color:var(--ink-2);overflow-wrap:anywhere}
+.arr-back{align-self:flex-start;display:inline-flex;align-items:center;gap:2px;margin:-4px 0 -8px -4px}
+.arr-back .ico{width:18px;height:18px}
+.dlg-body .input.search{width:100%;height:42px;background-color:var(--raised)}
 .frow-in{display:flex;align-items:center;gap:12px;min-height:50px;padding:0 16px;cursor:text;transition:background-color .15s}
 .frow-in:focus-within{background:var(--tint-soft)}
 .frow-in span{flex:0 0 92px;font-size:16px}
@@ -529,6 +563,8 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
   <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.5" width="14" height="10" rx="2.6"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.5 15.5 4.6 4.6"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5.5 12.6 4.1 4.1 8.9-9.3"/></symbol>
+  <symbol id="i-arrivals" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.2-5.3-6.2-10.6a6.2 6.2 0 0 1 12.4 0C18.2 15.7 12 21 12 21Z"/><path d="M12 7.6v3l2 1.3"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 6-6 6 6 6"/></symbol>
 </svg>
 
 <div class="app" id="app">
@@ -541,6 +577,7 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
       </div>
       <div class="nb-trail">
         <button class="iconbtn theme" type="button" id="themeBtn" aria-label="Switch theme" title="Switch theme"><svg class="ico sun" aria-hidden="true"><use href="#i-sun"/></svg><svg class="ico moon" aria-hidden="true"><use href="#i-moon"/></svg></button>
+        <button class="iconbtn" type="button" id="arrivalsBtn" aria-label="Arrivals, last 30 days" title="Arrivals, last 30 days" hidden><svg class="ico" aria-hidden="true"><use href="#i-arrivals"/></svg></button>
         <button class="iconbtn" type="button" id="settingsBtn" aria-label="Settings" title="Settings"><svg class="ico" aria-hidden="true"><use href="#i-gear"/></svg></button>
         <button class="btn nb-act" type="button" id="refreshBtn" title="Load the Work Programme again"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg><span class="lbl">Refresh</span></button>
       </div>
@@ -1018,6 +1055,7 @@ function jobBlock(e, opts = {}) {
         ${e.job.postcode ? `<span>${esc(e.job.postcode)}</span>` : ""}
         ${e.job.wfm ? `<span>WFM ${esc(e.job.wfm)}</span>` : ""}
         ${k === "flr" ? `<span class="st">FLR</span>` : statusChip(e.status)}
+        ${opts.me && opts.day ? arrChip(opts.day, e.id, opts.me) : ""}
       </span>
       ${others.length ? `<span class="with">with ${esc(others.join(", "))}</span>` : ""}
     </span>${icon("ext", "go")}
@@ -1150,7 +1188,7 @@ function renderDayBody() {
       html += h`<article class="frow${items.length ? " has-jobs" : ""}">
         <div class="fr-who">${avatar(f)}<div class="fr-id"><h3 class="fr-name">${esc(f.name)}</h3>${tags ? `<div class="fr-tags">${tags}</div>` : ""}</div>${statePill(d)}</div>
         ${flags ? `<div class="fr-flags">${flags}</div>` : ""}
-        ${items.length ? `<div class="jobs">${items.map(e => jobBlock(e, { me: f.label })).join("")}</div>` : ""}
+        ${items.length ? `<div class="jobs">${items.map(e => jobBlock(e, { me: f.label, day: iso })).join("")}</div>` : ""}
       </article>`;
     }
     html += `</div></section>`;
@@ -1186,7 +1224,7 @@ function renderFitter() {
     rows += h`<article class="drow ${d.clash ? "clash" : d.state}${p.wk ? " weekend" : ""}${iso === days[0] ? " today" : ""}">
       <div class="dtile" aria-label="${fullDate(iso)}"><small>${p.dow}</small><b>${p.num}</b><small>${p.mon}</small></div>
       <div class="dstate">${statePill(d)}${iso === days[0] ? `<span class="tag today">Today</span>` : ""}${flagPills(d)}</div>
-      ${items.length ? `<div class="jobs">${items.map(e => jobBlock(e, { me: selFitter })).join("")}</div>` : ""}
+      ${items.length ? `<div class="jobs">${items.map(e => jobBlock(e, { me: selFitter, day: iso })).join("")}</div>` : ""}
     </article>`;
   }
   el.innerHTML = h`<div class="toolbar"><div class="fid">${me ? avatar(me) : ""}<label class="picker" for="fitterSel"><span class="sr">Choose a fitter</span><select class="input" id="fitterSel" aria-label="Choose a fitter">
@@ -1244,7 +1282,7 @@ function renderJobsBody() {
           ${showParent ? `<span class="p">${esc(e.job.name)}</span>` : ""}
           <span class="m"><span>${esc(rangeLabel(e.from, e.to))}</span>${e.job.postcode ? `<span>${esc(e.job.postcode)}</span>` : ""}${e.job.wfm ? `<span>WFM ${esc(e.job.wfm)}</span>` : ""}<span>${esc(e.job.group)}</span>${statusChip(e.status)}</span>
         </span>
-        <span class="jr-fit">${un ? `<span class="none">No fitter assigned</span>` : e.fitters.map(f => { const pf = parseLabel(f), x = faceOf(pf); return x && x.photo ? `<span class="has-face"><img class="mini" src="${x.photo}" alt="" loading="lazy" decoding="async">${esc(pf.name)}</span>` : `<span>${esc(pf.name)}</span>`; }).join("")}</span>
+        <span class="jr-fit">${un ? `<span class="none">No fitter assigned</span>` : e.fitters.map(f => { const pf = parseLabel(f), x = faceOf(pf), a = arrMini(e.id, f); return x && x.photo ? `<span class="has-face"><img class="mini" src="${x.photo}" alt="" loading="lazy" decoding="async">${esc(pf.name)}${a}</span>` : `<span>${esc(pf.name)}${a}</span>`; }).join("")}</span>
         ${icon("ext", "go")}
       </a>`;
     }
@@ -1448,19 +1486,130 @@ async function loadFaces() {
     });
     const { data: got } = await c.auth.getSession();
     if (!got || !got.session) return;
+    hubClient = c;
     const { data: r, error } = await c.rpc("fitter_faces");
-    if (error || !r || !Array.isArray(r.people)) return;
-    const m = new Map();
-    for (const x of r.people) {
-      if (!x || typeof x.name !== "string") continue;
-      const regs = Array.isArray(x.regs) ? x.regs.filter(v => typeof v === "string" && v.trim()).map(v => v.trim()) : [];
-      const photo = typeof x.photo === "string" && PHOTO_RE.test(x.photo) ? x.photo : "";
-      if (regs.length || photo) m.set(faceKey(x.name), { regs, photo });
+    if (!error && r && Array.isArray(r.people)) {
+      const m = new Map();
+      for (const x of r.people) {
+        if (!x || typeof x.name !== "string") continue;
+        const regs = Array.isArray(x.regs) ? x.regs.filter(v => typeof v === "string" && v.trim()).map(v => v.trim()) : [];
+        const photo = typeof x.photo === "string" && PHOTO_RE.test(x.photo) ? x.photo : "";
+        if (regs.length || photo) m.set(faceKey(x.name), { regs, photo });
+      }
+      faces = m;
+      if (data) renderAll();
     }
-    faces = m;
-    if (data) renderAll();
   } catch (e) { /* no photos: the schedule works exactly as before */ }
+  loadArrivals();
 }
+
+/* ---------- arrivals: when each fitter's van reached the site (FleetView), for FLR administrators ---------- */
+// The flr-arrivals function checks FleetView every two minutes and keeps, per day, job and fitter, when their van stopped
+// at the site and when it left (public.fitter_arrivals, for administrators only: anyone else gets nothing and sees the
+// page as before). A visit still waiting shows nothing until 10:00; after that, like anything uncertain, "Arrival not
+// confirmed", with the reason on hover and in the job's log.
+let hubClient = null;       // the Hub's database connection, once signed in
+let arrivals = null;        // { today, checkedAt, problem, visits, by: Map("day|entry|fitter" -> visit), sig }
+let arrTimer = 0, arrSearch = "", arrEntry = null, arrBack = false;
+const ukClock = (s, secs) => s ? new Date(s).toLocaleTimeString("en-GB", { timeZone: "Europe/London", hour: "2-digit", minute: "2-digit", ...(secs ? { second: "2-digit" } : {}), hourCycle: "h23" }) : "";
+function arrOf(day, entry, fitter) { return arrivals ? arrivals.by.get(`${day}|${entry}|${fitter}`) || null : null; }
+function arrState(v) {
+  if (!v) return null;
+  if (v.status === "on_site") return { cls: "on", text: `On site · Arrived ${ukClock(v.arrivedAt)}`, mini: ukClock(v.arrivedAt) };
+  if (v.status === "left") return { cls: "done", text: `Arrived ${ukClock(v.arrivedAt)}${v.leftAt ? ` · left ${ukClock(v.leftAt)}` : ""}`, mini: v.leftAt ? `${ukClock(v.arrivedAt)}–${ukClock(v.leftAt)}` : ukClock(v.arrivedAt) };
+  if (v.status === "not_confirmed") return { cls: "nc", text: "Arrival not confirmed", mini: "not confirmed" };
+  return null;
+}
+function arrDetail(v) {
+  if (v.status === "not_confirmed") return v.reason || "No arrival was confirmed";
+  if (v.status === "waiting") return "The van hasn't stopped at the site yet";
+  const at = `${v.reg || "The van"} stopped ${v.distance != null ? `${v.distance} m from ${v.postcode || "the site"}` : `at ${v.postcode || "the site"}`} at ${ukClock(v.arrivedAt, true)}`;
+  return v.leftAt ? `${at} and left at ${ukClock(v.leftAt, true)}` : v.status === "on_site" ? `${at} and is still there` : at;
+}
+function arrChip(day, entry, fitter) {
+  const v = arrOf(day, entry, fitter), st = arrState(v);
+  if (!st) return "";
+  const detail = arrDetail(v);
+  return `<span class="arr ${st.cls}" role="button" tabindex="0" data-arr="${esc(entry)}" title="${esc(detail)}" aria-label="${esc(`${st.text}. ${detail}. Show this job's arrivals`)}">${esc(st.text)}</span>`;
+}
+function arrMini(entry, fitter) {
+  if (!arrivals) return "";
+  const v = arrOf(arrivals.today, entry, fitter), st = arrState(v);
+  return st ? `<span class="t-arr ${st.cls}" title="${esc(arrDetail(v))}">${esc(st.mini)}</span>` : "";
+}
+async function loadArrivals() {
+  clearTimeout(arrTimer);
+  if (!hubClient) return;
+  try {
+    const { data: r, error } = await hubClient.rpc("fitter_arrivals", { p_days: 30 });
+    if (error || !r || !Array.isArray(r.visits)) {
+      if (error && /FLR_|permission/i.test(String(error.message || ""))) { arrivals = null; syncArrivalsUI(); }
+      return;
+    }
+    const sig = JSON.stringify([r.today, r.problem, r.visits]);
+    if (arrivals && arrivals.sig === sig) { arrivals.checkedAt = r.checkedAt; return; }
+    const by = new Map();
+    for (const v of r.visits) if (v && v.day && v.entry && v.fitter) by.set(`${v.day}|${v.entry}|${v.fitter}`, v);
+    arrivals = { today: r.today, checkedAt: r.checkedAt, problem: r.problem || "", visits: r.visits, by, sig };
+    syncArrivalsUI();
+    if (data) renderAll();
+    if (sheetUI.open && sheetKind === "arrivals") { const l = document.getElementById("arrList"); if (l) l.innerHTML = arrivalsList(); }
+    else if (sheetUI.open && sheetKind === "arrival" && arrEntry) openArrival(arrEntry, arrBack);
+  } catch (e) { /* arrivals stay as they were */ }
+  finally { if (arrivals && !document.hidden) arrTimer = setTimeout(loadArrivals, 2 * 60000); }
+}
+function syncArrivalsUI() { document.getElementById("arrivalsBtn").hidden = !arrivals; }
+function arrRow(v, withJob) {
+  const st = arrState(v) || { cls: "", text: "Not arrived yet" };
+  const who = `${esc(v.name || parseLabel(v.fitter).name)}${v.reg ? ` · ${esc(v.reg)}` : ""}`;
+  const job = [v.wfm ? `WFM ${esc(v.wfm)}` : "", esc(v.postcode || "")].filter(Boolean).join(" · ");
+  return withJob
+    ? `<button type="button" class="arow" data-arr-open="${esc(v.entry)}"><i class="dot ${st.cls}" aria-hidden="true"></i><b>${who}</b>
+        <span class="j">${esc(v.entryName || v.jobName || "Job")}${job ? ` · ${job}` : ""}</span><span class="s ${st.cls}">${esc(st.text)}</span></button>`
+    : `<div class="arow static"><i class="dot ${st.cls}" aria-hidden="true"></i><b>${who}</b><span class="s ${st.cls}">${esc(st.text)}</span><span class="x">${esc(arrDetail(v))}</span></div>`;
+}
+const arrDayTitle = d => d === arrivals.today ? "Today" : fullDate(d);
+function arrivalsList() {
+  const q = arrSearch.trim().toLowerCase();
+  const list = arrivals.visits.filter(v => v.status !== "waiting" || v.day === arrivals.today)
+    .filter(v => !q || [v.name, v.fitter, v.entryName, v.jobName, v.wfm, v.postcode, v.reg].join(" ").toLowerCase().includes(q));
+  const byDay = new Map();
+  for (const v of list) { if (!byDay.has(v.day)) byDay.set(v.day, []); byDay.get(v.day).push(v); }
+  const html = [...byDay.entries()].sort((a, b) => b[0].localeCompare(a[0])).map(([d, vs]) =>
+    `<section><h3 class="eyebrow">${esc(arrDayTitle(d))}</h3><div class="group">${vs.map(v => arrRow(v, true)).join("")}</div></section>`).join("");
+  return html || `<p class="lede">${q ? "Nothing matches." : "No arrivals recorded yet."}</p>`;
+}
+function openArrivals() {
+  if (!arrivals) return;
+  sheetKind = "arrivals"; arrEntry = null;
+  const checked = arrivals.checkedAt ? `Checked every 2 minutes · last check ${ukClock(arrivals.checkedAt)}` : "Checked every 2 minutes";
+  sheetUI.show(`<header class="dlg-head"><h2 id="sheetTitle">Arrivals</h2><button class="close" type="button" data-act="sheet-close" aria-label="Close arrivals">${icon("close")}</button></header>
+    <div class="dlg-body">
+      <div><p class="lede">When each fitter's van reached the site, over the last 30 days, from FleetView.</p>
+        <p class="arr-meta">${esc(checked)}${arrivals.problem ? ` · ${esc(arrivals.problem)}` : ""}</p></div>
+      <input class="input search" id="arrSearch" type="search" placeholder="Search fitter, job, WFM or postcode" value="${esc(arrSearch)}" aria-label="Search arrivals" autocomplete="off">
+      <div id="arrList" style="display:flex;flex-direction:column;gap:18px">${arrivalsList()}</div>
+    </div>`, "arrivals");
+}
+function openArrival(entry, back) {
+  if (!arrivals) return;
+  sheetKind = "arrival"; arrEntry = entry; arrBack = !!back;
+  const list = arrivals.visits.filter(v => v.entry === entry);
+  const v0 = list[0] || {}, e = data ? data.entries.find(x => x.id === entry) : null;
+  const link = e ? jobLink(e) : v0.jobId ? MONDAY_BOARD_URL + v0.jobId : "";
+  const title = v0.entryName || (e && e.name) || "Job", parent = v0.jobName || (e && e.job.name) || "";
+  const where = [v0.wfm || (e && e.job.wfm) ? `WFM ${esc(v0.wfm || e.job.wfm)}` : "", esc(v0.postcode || (e && e.job.postcode) || "")].filter(Boolean).join(" · ");
+  const days = [...new Set(list.map(v => v.day))].sort().reverse();
+  sheetUI.show(`<header class="dlg-head"><h2 id="sheetTitle">Arrivals</h2><button class="close" type="button" data-act="sheet-close" aria-label="Close arrivals">${icon("close")}</button></header>
+    <div class="dlg-body">
+      ${back ? `<button type="button" class="linkbtn arr-back" id="arrBack">${icon("back")}All arrivals</button>` : ""}
+      <div class="arr-job"><h3>${esc(title)}</h3>${parent && parent.trim() !== title.trim() ? `<p>${esc(parent)}</p>` : ""}${where ? `<p>${where}</p>` : ""}</div>
+      ${days.map(d => `<section><h3 class="eyebrow">${esc(arrDayTitle(d))}</h3><div class="group">${list.filter(v => v.day === d).map(v => arrRow(v, false)).join("")}</div></section>`).join("")
+        || `<p class="lede">No arrivals recorded for this job in the last 30 days.</p>`}
+    </div>
+    ${link ? `<footer class="dlg-foot"><a class="btn lg block" href="${esc(link)}" target="_blank" rel="noopener">Open in monday.com</a></footer>` : ""}`, "arrival");
+}
+document.addEventListener("visibilitychange", () => { if (document.hidden) clearTimeout(arrTimer); else if (hubClient) loadArrivals(); });
 
 /* ---------- theme ---------- */
 // "Auto" follows the viewer: their own light/dark choice in Claude if they made one, otherwise the device.
@@ -1503,9 +1652,16 @@ document.getElementById("days").addEventListener("keydown", ev => {
   ev.preventDefault();
   selectDay(list[j].dataset.day, { focus: true });
 });
+document.getElementById("arrivalsBtn").addEventListener("click", openArrivals);
 document.addEventListener("click", ev => {
   if (ev.target.closest("#keySave")) { saveKey(); return; }
   if (ev.target.closest("#changeKey")) { openSheet("key"); return; }
+  // An arrival on a job card opens that job's log, not monday.com (the card itself still does).
+  const chip = ev.target.closest("[data-arr]");
+  if (chip) { ev.preventDefault(); ev.stopPropagation(); openArrival(chip.dataset.arr, false); return; }
+  const arow = ev.target.closest("[data-arr-open]");
+  if (arow) { openArrival(arow.dataset.arrOpen, true); return; }
+  if (ev.target.closest("#arrBack")) { openArrivals(); return; }
   const el = ev.target.closest("[data-act]");
   if (!el) return;
   switch (el.dataset.act) {
@@ -1520,6 +1676,7 @@ document.addEventListener("input", ev => {
   const t = ev.target;
   if (t.id === "searchDay") { search = t.value; renderDayBody(); }
   else if (t.id === "searchJobs") { search = t.value; renderJobsBody(); }
+  else if (t.id === "arrSearch") { arrSearch = t.value; const l = document.getElementById("arrList"); if (l && arrivals) l.innerHTML = arrivalsList(); }
 });
 document.addEventListener("change", ev => {
   const t = ev.target;
@@ -1530,6 +1687,8 @@ document.addEventListener("change", ev => {
   if (t.type === "checkbox" && t.closest("#sheet") && t.id in settings) { settings[t.id] = t.checked; store.set("settings", settings); if (data) renderAll(); }
 });
 document.addEventListener("keydown", ev => {
+  const chip = ev.target.closest && ev.target.closest("[data-arr]");
+  if (chip && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); openArrival(chip.dataset.arr, false); return; }
   if (ev.key === "Escape" && sheetUI.open && canDismissSheet()) { ev.preventDefault(); closeSheet(); }
   if (ev.key === "Enter" && ev.target.id === "keyInput") { ev.preventDefault(); saveKey(); }
 });
