@@ -72,6 +72,7 @@ Open the link in Safari (iPhone) or Chrome (Android) → *Share* / menu → **Ad
 - **Fitter** tab: one fitter's fortnight — good for fitters bookmarking their own view (the selection is remembered).
 - **Jobs** tab: every scheduled entry in the window, grouped by start date, unassigned ones highlighted; *Needs fitter* shows only those.
 - **Settings** (cog): theme (Auto / Light / Dark), weekends, weekend rota, FLR/Sub rows, Completed jobs.
+- **Photos and number plates**: in a browser that is signed in on the [FLR Hub](https://flrmarketing.github.io/flr-hub/) (same site), each fitter shows their staff photo and the registration FleetView has for them, as in Fleet Management. They come from the FLR database (`public.fitter_faces()`) after sign-in, never from this repository; without a Hub sign-in the page shows initials and van codes. The page loads the Hub's `flr-config.js` and `vendor/supabase-2.116.0.js` for this.
 
 ## Changing the passcode or token
 

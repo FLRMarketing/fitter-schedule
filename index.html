@@ -41,6 +41,8 @@
   --sh-sheet:0 28px 80px rgba(16,18,40,.3),0 2px 8px rgba(16,18,40,.1);
   --sh-thumb:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04);
   --sh-pick:0 8px 18px rgba(0,9,139,.24),0 1px 3px rgba(0,9,139,.18);
+  --plate:#f8d33a; --plate-ink:#111111; --plate-edge:rgba(0,0,0,.55); --ph-bg:#e5e5ea;
+  --plate-font:"Roboto Condensed","Arial Narrow","Helvetica Neue",Arial,sans-serif;
   --font-text:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --font-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --font-num:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -71,6 +73,7 @@
     --sh-sheet:0 30px 90px rgba(0,0,0,.7),0 0 0 .5px rgba(255,255,255,.08);
     --sh-thumb:0 3px 8px rgba(0,0,0,.3);
     --sh-pick:0 8px 20px rgba(0,0,0,.5);
+    --plate-edge:rgba(0,0,0,.7); --ph-bg:#2c2c2e;
   }
 }
 :root[data-theme="dark"]{
@@ -94,6 +97,7 @@
   --sh-sheet:0 30px 90px rgba(0,0,0,.7),0 0 0 .5px rgba(255,255,255,.08);
   --sh-thumb:0 3px 8px rgba(0,0,0,.3);
   --sh-pick:0 8px 20px rgba(0,0,0,.5);
+  --plate-edge:rgba(0,0,0,.7); --ph-bg:#2c2c2e;
 }
 @media (prefers-reduced-transparency:reduce){:root:root{--mat:var(--mat-solid);--blur:none}}
 @media (prefers-contrast:more){:root:root{--sep:var(--line-2);--ink-3:var(--ink-2);--mat:var(--mat-solid);--blur:none}}
@@ -325,7 +329,16 @@ input.input[type="search"]{padding-left:34px;background-repeat:no-repeat;backgro
 .avatar.sub{background:var(--fill);color:var(--ink-2)}
 .fr-id{flex:1 1 auto;min-width:0}
 .fr-name{font:600 16px/1.25 var(--font-text);letter-spacing:-.014em;overflow-wrap:anywhere}
-.fr-tags{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:4px}
+.fr-tags{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:4px}
+/* Photos and number plates, as in Fleet Management (for browsers signed in on the FLR Hub) */
+img.avatar{object-fit:cover;background:var(--ph-bg)}
+.veh{display:inline-flex;align-items:center;gap:6px;color:var(--ink-3)}
+.veh .ico{width:19px;height:19px}
+.plate{display:inline-block;padding:2px 6px 1px;border:1px solid var(--plate-edge);border-radius:5px;background:var(--plate);color:var(--plate-ink);
+  font:700 12.5px/1.1 var(--plate-font);letter-spacing:.07em;white-space:nowrap;box-shadow:inset 0 0 0 1px rgba(255,255,255,.4)}
+.fid{display:flex;align-items:center;gap:12px;flex:1 1 420px;min-width:0;max-width:560px}
+.fid .avatar{width:44px;height:44px;font-size:15px}
+.fid .picker{flex:1 1 auto}
 .van,.tag{display:inline-flex;align-items:center;gap:5px;padding:1px 7px;border-radius:6px;background:var(--fill);color:var(--ink-2);
   font:600 12px/1.5 var(--font-text);letter-spacing:.02em;white-space:nowrap}
 .van{padding-left:5px}
@@ -405,7 +418,9 @@ input.input[type="search"]{padding-left:34px;background-repeat:no-repeat;backgro
 .jr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .jr-top .t{font:600 15px/1.32 var(--font-text);letter-spacing:-.012em;overflow-wrap:anywhere}
 .jr-fit{display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px;min-width:0}
-.jr-fit span{padding:2px 9px;border-radius:999px;background:var(--fill);font:500 12.5px/1.45 var(--font-text);white-space:nowrap}
+.jr-fit span{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;background:var(--fill);font:500 12.5px/1.45 var(--font-text);white-space:nowrap}
+.jr-fit span.has-face{padding-left:2px}
+.jr-fit .mini{display:block;width:18px;height:18px;margin-right:6px;border-radius:50%;object-fit:cover;background:var(--ph-bg)}
 .jr-fit .none{background:var(--red-soft);color:var(--red-ink);font-weight:600}
 .jrow .go{grid-column:2;grid-row:1;align-self:center}
 @media (max-width:899px){.jr-fit{grid-column:1}}
@@ -482,6 +497,7 @@ input.input[type="search"]{padding-left:34px;background-repeat:no-repeat;backgro
 </style>
 </head>
 <body>
+<script>window.FLR_HUB = window.FLR_HUB || { config: "/flr-hub/flr-config.js", supabase: "/flr-hub/vendor/supabase-2.116.0.js" };</script>
 <svg class="defs" aria-hidden="true" focusable="false">
   <symbol id="flr-mark" viewBox="4 8 143 164"><path fill="#a7a9ac" fill-rule="evenodd" d="M 13.99 170.7 L 146.26 170.7 L 146.26 16.51 L 13.99 16.51 Z M 13.99 170.7 "/><path fill="#001796" fill-rule="evenodd" d="M 5.39 43.18 L 40.73 9.45 L 76.07 43.18 L 40.73 76.92 Z M 5.39 43.18 "/><path fill="#ffffff" fill-rule="nonzero" d="M 31.05 131.55 L 31.05 142.08 L 53.86 142.08 L 53.86 148.14 L 31.05 148.14 L 31.05 164.14 L 21.23 164.14 L 21.23 125.32 L 55.09 125.32 L 55.09 131.55 Z M 31.05 131.55 "/><path fill="#ffffff" fill-rule="nonzero" d="M 71.25 125.32 L 71.25 157.62 L 94.97 157.62 L 94.97 164.14 L 61.27 164.14 L 61.27 125.32 Z M 71.25 125.32 "/><path fill="#ffffff" fill-rule="nonzero" d="M 100.07 164.14 L 100.07 125.32 L 124.95 125.32 C 130.84 125.36 135.09 126.22 137.7 127.91 C 140.31 129.6 141.61 132.75 141.61 137.37 L 141.61 138.82 C 141.61 139.32 141.56 139.83 141.46 140.34 C 141.36 141.42 141.09 142.49 140.66 143.54 C 140.22 144.59 139.46 145.46 138.39 146.16 C 137.77 146.54 137.1 146.86 136.36 147.09 C 135.61 147.32 134.86 147.52 134.09 147.67 C 133.78 147.71 133.49 147.76 133.21 147.82 C 132.93 147.88 132.63 147.92 132.32 147.96 L 132.32 148.14 C 135.34 148.33 137.54 149.07 138.93 150.35 C 140.31 151.63 141 153.41 141 155.7 L 141 164.14 L 131.1 164.14 L 131.1 157.1 L 131.17 156.23 C 131.12 154.29 130.39 152.96 128.98 152.27 C 127.57 151.57 125.72 151.22 123.42 151.22 L 109.59 151.16 L 109.59 164.14 Z M 109.59 144.93 L 123.42 144.93 C 126.44 144.97 128.55 144.54 129.75 143.62 C 130.95 142.71 131.55 141.17 131.55 139 C 131.55 136.59 131.21 134.8 130.52 133.61 C 129.83 132.43 127.66 131.84 124.03 131.84 L 109.59 131.78 Z M 109.59 144.93 "/></symbol>
   <symbol id="i-day" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -971,7 +987,17 @@ function initials(name) {
   if (!parts.length) return "?";
   return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : "")).toUpperCase();
 }
-function avatar(f) { return `<span class="avatar${f.kind === "flr" ? " flr" : f.kind === "sub" ? " sub" : ""}" aria-hidden="true">${esc(initials(f.name))}</span>`; }
+function avatar(f) {
+  const cls = `avatar${f.kind === "flr" ? " flr" : f.kind === "sub" ? " sub" : ""}`, x = faceOf(f);
+  return x && x.photo ? `<img class="${cls}" src="${x.photo}" alt="" loading="lazy" decoding="async">` : `<span class="${cls}" aria-hidden="true">${esc(initials(f.name))}</span>`;
+}
+// The registration Fleet Management has for them (the van they drove most), else the van code on their Work Programme label.
+function regOf(f) { const x = faceOf(f); return x && x.regs.length ? x.regs[0] : ""; }
+function vanTag(f) {
+  const x = faceOf(f);
+  if (x && x.regs.length) return `<span class="veh" title="${esc(x.regs.length > 1 ? "Also drives " + x.regs.slice(1).join(", ") : "Van")}">${icon("van")}<span class="plate">${esc(x.regs[0])}</span></span>`;
+  return f.van ? vanChip(f.van) : "";
+}
 function vanChip(van) { return `<span class="van" title="Van">${icon("van")}${esc(van)}</span>`; }
 function kindChip(f) { return f.kind === "flr" ? `<span class="tag" title="FLR staff (ZFLR)">FLR</span>` : f.kind === "sub" ? `<span class="tag" title="Subcontractor (ZSub)">Sub</span>` : ""; }
 function statePill(d) {
@@ -1119,10 +1145,10 @@ function renderDayBody() {
     const anyItems = list.some(({ d }) => d.jobs.length || d.flr.length || d.off.length);
     html += `<section class="sect ${g.cls}"><header class="sect-head"><h2><i class="sw ${g.cls}" aria-hidden="true"></i>${g.title}</h2><span class="cnt">${list.length}</span></header><div class="group${anyItems ? "" : " tiles"}">`;
     for (const { f, d } of list) {
-      const flags = flagPills(d);
+      const flags = flagPills(d), tags = vanTag(f) + kindChip(f);
       const items = [...d.jobs, ...d.flr, ...d.off];
       html += h`<article class="frow${items.length ? " has-jobs" : ""}">
-        <div class="fr-who">${avatar(f)}<div class="fr-id"><h3 class="fr-name">${esc(f.name)}</h3>${f.van || f.kind !== "fitter" ? `<div class="fr-tags">${f.van ? vanChip(f.van) : ""}${kindChip(f)}</div>` : ""}</div>${statePill(d)}</div>
+        <div class="fr-who">${avatar(f)}<div class="fr-id"><h3 class="fr-name">${esc(f.name)}</h3>${tags ? `<div class="fr-tags">${tags}</div>` : ""}</div>${statePill(d)}</div>
         ${flags ? `<div class="fr-flags">${flags}</div>` : ""}
         ${items.length ? `<div class="jobs">${items.map(e => jobBlock(e, { me: f.label })).join("")}</div>` : ""}
       </article>`;
@@ -1163,11 +1189,12 @@ function renderFitter() {
       ${items.length ? `<div class="jobs">${items.map(e => jobBlock(e, { me: selFitter })).join("")}</div>` : ""}
     </article>`;
   }
-  el.innerHTML = h`<div class="toolbar"><label class="picker" for="fitterSel"><span class="sr">Choose a fitter</span><select class="input" id="fitterSel" aria-label="Choose a fitter">
-      ${list.map(f => `<option value="${esc(f.label)}" ${f.label === selFitter ? "selected" : ""}>${esc(f.name)}${f.van ? " · " + esc(f.van) : ""}${f.kind === "flr" ? " (FLR)" : f.kind === "sub" ? " (Sub)" : ""}</option>`).join("")}
-    </select></label></div>
+  el.innerHTML = h`<div class="toolbar"><div class="fid">${me ? avatar(me) : ""}<label class="picker" for="fitterSel"><span class="sr">Choose a fitter</span><select class="input" id="fitterSel" aria-label="Choose a fitter">
+      ${list.map(f => { const van = regOf(f) || f.van; return `<option value="${esc(f.label)}" ${f.label === selFitter ? "selected" : ""}>${esc(f.name)}${van ? " · " + esc(van) : ""}${f.kind === "flr" ? " (FLR)" : f.kind === "sub" ? " (Sub)" : ""}</option>`; }).join("")}
+    </select></label></div>${me ? vanTag(me) : ""}</div>
     <div class="group" id="fitterDays">${rows}</div>`;
-  const who = me ? [me.van ? `Van ${me.van}` : "", me.kind === "flr" ? "FLR staff" : me.kind === "sub" ? "Subcontractor" : ""].filter(Boolean).join(" · ") : "";
+  const van = me ? regOf(me) || me.van : "";
+  const who = me ? [van ? `Van ${van}` : "", me.kind === "flr" ? "FLR staff" : me.kind === "sub" ? "Subcontractor" : ""].filter(Boolean).join(" · ") : "";
   const tally = `${count.busy} working · ${count.free} free · ${count.off} off`;
   setHead(me ? me.name : "Fitter", [who, tally].filter(Boolean).join(" · "));
 }
@@ -1217,7 +1244,7 @@ function renderJobsBody() {
           ${showParent ? `<span class="p">${esc(e.job.name)}</span>` : ""}
           <span class="m"><span>${esc(rangeLabel(e.from, e.to))}</span>${e.job.postcode ? `<span>${esc(e.job.postcode)}</span>` : ""}${e.job.wfm ? `<span>WFM ${esc(e.job.wfm)}</span>` : ""}<span>${esc(e.job.group)}</span>${statusChip(e.status)}</span>
         </span>
-        <span class="jr-fit">${un ? `<span class="none">No fitter assigned</span>` : e.fitters.map(f => `<span>${esc(shortName(f))}</span>`).join("")}</span>
+        <span class="jr-fit">${un ? `<span class="none">No fitter assigned</span>` : e.fitters.map(f => { const pf = parseLabel(f), x = faceOf(pf); return x && x.photo ? `<span class="has-face"><img class="mini" src="${x.photo}" alt="" loading="lazy" decoding="async">${esc(pf.name)}</span>` : `<span>${esc(pf.name)}</span>`; }).join("")}</span>
         ${icon("ext", "go")}
       </a>`;
     }
@@ -1399,6 +1426,42 @@ function saveKey() {
   store.set("key", v); closeSheet(); load(true);
 }
 
+/* ---------- photos and number plates: Fleet Management's data, when this browser is signed in on the FLR Hub ---------- */
+// On its own site the page shares the Hub's web address, so a Hub sign-in (the Cost Estimator's session key) is here too.
+// With one, the FLR database hands over each driver's photo and registrations (public.fitter_faces), to the people the
+// Hub's Fitter Schedule tile is for. Without one nothing is loaded and the page shows initials and van codes as before.
+let faces = null;   // lower-cased name -> { regs: [most-driven first], photo: data URL or "" }
+const PHOTO_RE = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+const faceKey = n => String(n || "").trim().replace(/\s+/g, " ").toLowerCase();
+function faceOf(f) { return faces && f ? faces.get(faceKey(f.name)) || null : null; }
+function hubSignedIn() { try { return !!localStorage.getItem("flr-estimator-auth"); } catch (e) { return false; } }
+function addScript(src) { return new Promise((ok, fail) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = fail; document.head.appendChild(s); }); }
+async function loadFaces() {
+  const hub = window.FLR_HUB;   // set only on the live site: where the Hub's sign-in files are
+  if (!hub || !hubSignedIn()) return;
+  try {
+    if (!window.FLR_CONFIG) await addScript(hub.config);
+    if (!window.supabase) await addScript(hub.supabase);
+    const cfg = window.FLR_CONFIG || {};
+    const c = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: "flr-estimator-auth" },
+    });
+    const { data: got } = await c.auth.getSession();
+    if (!got || !got.session) return;
+    const { data: r, error } = await c.rpc("fitter_faces");
+    if (error || !r || !Array.isArray(r.people)) return;
+    const m = new Map();
+    for (const x of r.people) {
+      if (!x || typeof x.name !== "string") continue;
+      const regs = Array.isArray(x.regs) ? x.regs.filter(v => typeof v === "string" && v.trim()).map(v => v.trim()) : [];
+      const photo = typeof x.photo === "string" && PHOTO_RE.test(x.photo) ? x.photo : "";
+      if (regs.length || photo) m.set(faceKey(x.name), { regs, photo });
+    }
+    faces = m;
+    if (data) renderAll();
+  } catch (e) { /* no photos: the schedule works exactly as before */ }
+}
+
 /* ---------- theme ---------- */
 // "Auto" follows the viewer: their own light/dark choice in Claude if they made one, otherwise the device.
 const HOST_THEME = document.documentElement.getAttribute("data-theme");
@@ -1477,6 +1540,7 @@ document.getElementById("stripBar").hidden = true;
 tabsCtl = FLRUI.initTabs(document.getElementById("tabs"), el => goTab(el.dataset.view));
 chrome = FLRUI.initChrome(document.getElementById("navbar"), () => document.getElementById("lt-title"), syncStrip);
 renderIdle();
+loadFaces();
 document.addEventListener("visibilitychange", () => { if (!document.hidden && data && !window.FLR_EMBEDDED && Date.now() - new Date(data.fetchedAt).getTime() > 10 * 60000) load(false); });
 setInterval(() => { if (data) setStatus(`${window.FLR_EMBEDDED ? "Snapshot" : "Updated"} ${timeAgo(data.fetchedAt)}`); }, 60000);
 
