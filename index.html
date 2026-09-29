@@ -1527,7 +1527,10 @@ function arrDetail(v) {
   if (v.status === "not_confirmed") return v.reason || "No arrival was confirmed";
   if (v.status === "waiting") return "The van hasn't stopped at the site yet";
   const at = `${v.reg || "The van"} stopped ${v.distance != null ? `${v.distance} m from ${v.postcode || "the site"}` : `at ${v.postcode || "the site"}`} at ${ukClock(v.arrivedAt, true)}`;
-  return v.leftAt ? `${at} and left at ${ukClock(v.leftAt, true)}` : v.status === "on_site" ? `${at} and is still there` : at;
+  // Trips away and back during the day (lunch, the merchant's), each [left, back].
+  const trips = Array.isArray(v.away) ? v.away.filter(p => Array.isArray(p) && p[0] && p[1]).map(([a, b]) => `${ukClock(a)}–${ukClock(b)}`) : [];
+  const away = trips.length ? `, was away ${trips.join(" and ")},` : "";
+  return v.leftAt ? `${at}${away} and left at ${ukClock(v.leftAt, true)}` : v.status === "on_site" ? `${at}${away} and is still there` : `${at}${away.replace(/,$/, "")}`;
 }
 function arrChip(day, entry, fitter) {
   const v = arrOf(day, entry, fitter), st = arrState(v);
