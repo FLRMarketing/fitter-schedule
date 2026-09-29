@@ -16,6 +16,8 @@
 <!-- The slide between the FLR Hub and its tools (same site): in from the right when opened from the Hub, out again on Back -->
 <link rel="stylesheet" href="/flr-hub/tool-transition.css">
 <script>addEventListener("pagereveal", e => { const t = e.viewTransition; if (t) { t.ready.catch(() => {}); t.finished.catch(() => {}); t.updateCallbackDone.catch(() => {}); } });</script>
+<!-- The FLR Hub's assistant, Likkle Jeff (same site): help in the corner, as on the Hub's own pages -->
+<script type="module" src="/flr-hub/assistant/assistant.js?v=2.1"></script>
 <style>
 /* ============================================================================
    FLR Fitter Schedule in the FLR Hub's look, shared with the Fleet report and
