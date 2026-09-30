@@ -418,33 +418,70 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
 .dstate{display:flex;flex-wrap:wrap;align-items:center;align-content:flex-start;gap:6px;min-width:0;min-height:28px}
 @media (min-width:900px){.drow{grid-template-columns:52px minmax(170px,214px) minmax(0,1fr);grid-template-areas:"tile state jobs";column-gap:18px}.dstate{padding-top:2px}}
 
-/* ---------------------------------------------------------------- jobs view: everything booked in the window, by start date */
+/* ---------------------------------------------------------------- jobs view: each job once, by start date; a tap opens it */
 .dgroup{margin:0 0 24px}
 .dg-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0 4px 10px}
 .dg-head h2{font:600 17px/1.3 var(--font-display);letter-spacing:-.016em}
-.jrow{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 15px;gap:9px 12px;padding:13px 16px 14px;color:inherit;text-decoration:none;
-  -webkit-tap-highlight-color:transparent;transition:background-color .15s}
-.jrow+.jrow::before{content:"";position:absolute;top:0;left:16px;right:0;height:var(--hair);background:var(--sep)}
+.jcard{position:relative}
+.jcard+.jcard::before{content:"";position:absolute;z-index:1;top:0;left:16px;right:0;height:var(--hair);background:var(--sep)}
+.jrow{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 16px;gap:9px 12px;width:100%;margin:0;padding:13px 16px 14px;border:0;background:none;
+  color:inherit;font:inherit;text-align:left;-webkit-tap-highlight-color:transparent;transition:background-color .15s}
+.jrow:focus-visible{outline-offset:-2px}
 @media (hover:hover){.jrow:hover{background:var(--row-hover)}}
 .jrow:active{background:var(--fill-2);transition-duration:0s}
 .jr-main{display:flex;flex-direction:column;gap:2px;min-width:0}
 .jr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .jr-top .t{font:600 15px/1.32 var(--font-text);letter-spacing:-.012em;overflow-wrap:anywhere}
 .jr-fit{display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px;min-width:0}
-.jr-fit span{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;background:var(--fill);font:500 12.5px/1.45 var(--font-text);white-space:nowrap}
-.jr-fit span.has-face{padding-left:2px}
-.jr-fit .mini{display:block;width:18px;height:18px;margin-right:6px;border-radius:50%;object-fit:cover;background:var(--ph-bg)}
-.jr-fit .none{background:var(--red-soft);color:var(--red-ink);font-weight:600}
-.jr-fit span.t-arr{display:inline-flex;align-items:center;gap:4px;margin-left:7px;padding:0;border-radius:0;background:none;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink-2)}
-.jr-fit span.t-arr.on{color:var(--green-ink)}
-.jr-fit span.t-arr.on::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.jr-fit span.t-arr.nc{color:var(--ink-3);font-weight:500}
-.jrow .go{grid-column:2;grid-row:1;align-self:center}
-@media (max-width:899px){.jr-fit{grid-column:1}}
+/* a person on the job: photo, name, their dates if not the job's, TBC, today's arrival; on a narrow screen it wraps under the name */
+.jf{display:inline-flex;align-items:flex-start;gap:6px;max-width:100%;padding:2px 9px;border-radius:13px;background:var(--fill);font:500 12.5px/1.45 var(--font-text)}
+.jf.has-face{padding-left:2px}
+.jf .mini{display:block;width:18px;height:18px;flex:none;border-radius:50%;object-fit:cover;background:var(--ph-bg)}
+.jf .tx{min-width:0}
+.jf .tx>*{white-space:nowrap}
+.jf .tx>*+*{margin-left:3px}
+.jf .d{color:var(--ink-2);font-variant-numeric:tabular-nums}
+.jf .tbc{padding:0 5px;border-radius:5px;background:var(--gold-soft);color:var(--gold-ink);font-weight:600;font-size:11.5px}
+.jf.none{background:var(--red-soft);color:var(--red-ink);font-weight:600;white-space:nowrap}
+.t-arr{font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.t-arr .ico{display:inline-block;width:13px;height:13px;margin-right:2px;vertical-align:-2px}
+.t-arr.on{color:var(--green-ink)}
+.t-arr.nc{color:var(--ink-3);font-weight:500}
+.jr-chev{grid-column:2;grid-row:1 / span 2;align-self:center;width:16px;height:16px;color:var(--ink-3);transition:transform .32s var(--ease)}
+.jcard.open .jr-chev{transform:rotate(90deg)}
+/* the opened part: its height eases open (0fr to 1fr); shut, it's hidden from taps, the tab key and screen readers */
+.jr-more{display:grid;grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows .32s var(--ease),visibility 0s linear .32s}
+.jcard.open .jr-more{grid-template-rows:1fr;visibility:visible;transition:grid-template-rows .32s var(--ease),visibility 0s}
+.jr-in{min-height:0;overflow:hidden}
+.jd{display:flex;flex-direction:column;gap:10px;padding:0 16px 16px}
+.jd-addr{font-size:13px;line-height:1.4;color:var(--ink-2);overflow-wrap:anywhere}
+.jd-list{border-radius:12px;background:var(--surface-2);box-shadow:inset 0 0 0 var(--hair) var(--sep)}
+.jp{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);column-gap:12px;row-gap:5px;align-items:start;padding:10px 12px 11px}
+.jp+.jp::before{content:"";position:absolute;top:0;left:54px;right:0;height:var(--hair);background:var(--sep)}
+.jp .avatar{grid-row:1 / span 2;width:30px;height:30px;font-size:11.5px}
+.avatar.need{background:var(--red-soft);color:var(--red-ink);font-size:15px}
+.jp-who{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;min-width:0;min-height:30px}
+.jp-who b{font:600 14.5px/1.3 var(--font-text);letter-spacing:-.01em;overflow-wrap:anywhere}
+.jp.need .jp-who b{color:var(--red-ink)}
+.jp-who .veh .ico{width:17px;height:17px}
+.jp-who .plate{font-size:11.5px}
+.jp-bks{display:grid;gap:5px;min-width:0}
+.bk{display:flex;flex-wrap:wrap;align-items:center;gap:3px 8px;min-width:0;font-size:13px;line-height:1.45;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.bk-d{font-weight:600;color:var(--ink)}
+.bk .n{color:var(--ink-3);overflow-wrap:anywhere}
+.st.ok{background:var(--green-soft);color:var(--green-ink)}
+.jd-acts{display:flex;flex-wrap:wrap;gap:8px}
+.btn.sm{min-height:32px;padding:0 13px;font-size:13.5px}
+.btn.sm .ico{width:15px;height:15px}
 @media (min-width:900px){
-  .jrow{grid-template-columns:minmax(0,1fr) minmax(200px,30%) 15px;column-gap:20px;align-items:start}
-  .jrow .go{grid-column:3;align-self:start;margin-top:3px}
+  .jrow{grid-template-columns:minmax(0,1fr) minmax(220px,34%) 16px;column-gap:20px;align-items:start}
+  .jr-chev{grid-column:3;grid-row:1;align-self:start;margin-top:2px}
+  .jd{padding:0 20px 18px 16px}
+  .jp{grid-template-columns:30px minmax(190px,260px) minmax(0,1fr);align-items:center}
+  .jp .avatar{grid-row:auto}
+  .jp-who{min-height:0}
 }
+@media (prefers-reduced-motion:reduce){.jr-chev,.jr-more,.jcard.open .jr-more{transition:none}}
 
 /* ---------------------------------------------------------------- footer */
 .foot{margin:34px 0 0;padding-top:14px;border-top:var(--hair) solid var(--sep);font-size:12.5px;line-height:1.6;color:var(--ink-3);text-align:center;font-variant-numeric:tabular-nums}
@@ -570,6 +607,7 @@ button.arow:active{background:var(--fill)}
   <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5.5 12.6 4.1 4.1 8.9-9.3"/></symbol>
   <symbol id="i-arrivals" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.2-5.3-6.2-10.6a6.2 6.2 0 0 1 12.4 0C18.2 15.7 12 21 12 21Z"/><path d="M12 7.6v3l2 1.3"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 6-6 6 6 6"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.5 6 6 6-6 6"/></symbol>
 </svg>
 
 <div class="app" id="app">
@@ -1259,39 +1297,138 @@ function renderJobs() {
   }
   renderJobsBody();
 }
+// One card per job. A job is a Work Programme item; its subitems in the window (one per fitter or crew, "(copy)" ones
+// included) come together only under the item they belong to (e.job.id), never because their names look alike, so
+// two jobs with similar names stay apart. A tap opens the card: each person's dates, status and arrival.
+const openJobs = new Set();   // cards left open, kept through re-renders
+const jobKey = e => e.job.id ? `j${e.job.id}` : `e${e.id}`;
+// Date spans, with overlapping or back-to-back bookings run together: [{ from, to }], earliest first.
+function spansOf(list) {
+  const out = [];
+  for (const e of [...list].sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to))) {
+    const s = out[out.length - 1];
+    if (s && e.from <= addDays(s.to, 1)) { if (e.to > s.to) s.to = e.to; }
+    else out.push({ from: e.from, to: e.to });
+  }
+  return out;
+}
+// "16–18, 21–25 Sep": one span as rangeLabel says it; several with the month said once where they share it.
+function spansLabel(spans) {
+  if (spans.length === 1) return rangeLabel(spans[0].from, spans[0].to);
+  return spans.map((s, i) => {
+    const a = dparts(s.from), b = dparts(s.to), n = spans[i + 1];
+    if (s.from.slice(0, 7) !== s.to.slice(0, 7)) return `${a.num} ${a.mon} – ${b.num} ${b.mon}`;
+    const d = s.from === s.to ? `${a.num}` : `${a.num}–${b.num}`;
+    return n && n.from.slice(0, 7) === s.to.slice(0, 7) ? d : `${d} ${b.mon}`;
+  }).join(", ");
+}
+function jobsOf(entries) {
+  const m = new Map();
+  for (const e of entries) { const k = jobKey(e); if (!m.has(k)) m.set(k, { key: k, job: e.job, entries: [] }); m.get(k).entries.push(e); }
+  return [...m.values()].map(j => {
+    j.entries.sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to));
+    j.spans = spansOf(j.entries);
+    j.from = j.spans[0].from;
+    const people = new Map();
+    for (const e of j.entries) for (const f of e.fitters) { if (!people.has(f)) people.set(f, []); people.get(f).push(e); }
+    j.people = [...people].map(([label, list]) => ({ label, f: parseLabel(label), entries: list }))
+      .sort((a, b) => a.entries[0].from.localeCompare(b.entries[0].from) || a.f.name.localeCompare(b.f.name));
+    j.needs = j.entries.filter(e => !e.fitters.length);
+    j.text = [j.job.name, j.job.postcode, j.job.wfm, ...j.entries.map(e => e.name), ...j.people.map(p => p.label)].join(" ").toLowerCase();
+    return j;
+  });
+}
+// What a subitem's name adds to its job's ("Welfare", "Carpet"), without "(copy)"; nothing when it only repeats it.
+function subName(e) {
+  const clean = s => String(s || "").replace(/\(copy\)/gi, " ").replace(/\s+/g, " ").trim();
+  const a = clean(e.name), b = clean(e.job.name), al = a.toLowerCase(), bl = b.toLowerCase();
+  if (!a || bl.startsWith(al)) return "";   // the job's name, or the start of it
+  if (al.startsWith(bl)) {                   // the job's name and more; "…- 12345" against "…- 1234" is a typo, not more
+    const more = a.slice(b.length);
+    return /^\w/.test(more) && /\w$/.test(b) ? "" : more.replace(/^[\s,:;–-]+/, "");
+  }
+  const as = a.split(/\s+-\s+/), bs = bl.split(/\s+-\s+/);
+  let i = 0;
+  while (i < as.length - 1 && i < bs.length && as[i].toLowerCase() === bs[i]) i++;
+  const rest = as.slice(i).join(" - ");
+  return /^\d{5}$/.test(rest) ? `WFM ${rest}` : rest;
+}
+// The subitem Status as the board has it: Scheduled is confirmed, TBC is still to be confirmed.
+function bookedChip(st) {
+  if (!st || st === "Default") return "";
+  return st === "Scheduled" ? `<span class="st ok">Scheduled</span>` : st === "TBC" ? `<span class="st tbc" title="To be confirmed">TBC</span>` : statusChip(st);
+}
+function jobCard(j) {
+  const open = openJobs.has(j.key), nNeed = j.needs.length, when = spansLabel(j.spans);
+  // TBC once for the job when every status set on it is TBC; otherwise on the chip of each person with a TBC booking
+  const statuses = [...new Set(j.entries.map(e => e.status))], set = statuses.filter(s => s && s !== "Default");
+  const tbcAll = set.length === 1 && set[0] === "TBC";
+  const ids = j.entries.map(e => e.id).join(",");
+  const today = arrivals ? arrivals.today : days[0];
+  const chips = j.people.map(p => {
+    const x = faceOf(p.f), mine = spansLabel(spansOf(p.entries));
+    const tbc = !tbcAll && p.entries.some(e => e.status === "TBC");
+    const arr = p.entries.map(e => arrMini(e.id, p.label)).find(Boolean) || "";
+    return `<span class="jf${x && x.photo ? " has-face" : ""}">${x && x.photo ? `<img class="mini" src="${x.photo}" alt="" loading="lazy" decoding="async">` : ""}<span class="tx"><span>${esc(p.f.name)}</span>${mine !== when ? ` <span class="d">${esc(mine)}</span>` : ""}${tbc ? ` <span class="tbc">TBC</span>` : ""}${arr ? " " + arr : ""}</span></span>`;
+  }).join("") || `<span class="jf none">No fitter assigned</span>`;
+
+  const bk = (e, who) => {
+    const n = subName(e), a = who && overlaps(e, today) ? arrChip(today, e.id, who, ids) : "";
+    return `<div class="bk"><span class="bk-d">${esc(rangeLabel(e.from, e.to))}</span>${bookedChip(e.status)}${n ? `<span class="n">${esc(n)}</span>` : ""}${a}</div>`;
+  };
+  const rows = j.people.map(p => `<div class="jp">${avatar(p.f)}<div class="jp-who"><b>${esc(p.f.name)}</b>${vanTag(p.f)}${kindChip(p.f)}</div>
+      <div class="jp-bks">${p.entries.map(e => bk(e, p.label)).join("")}</div></div>`).join("")
+    + j.needs.map(e => `<div class="jp need"><span class="avatar need" aria-hidden="true">?</span><div class="jp-who"><b>No fitter assigned</b></div>
+      <div class="jp-bks">${bk(e, "")}</div></div>`).join("");
+  const log = arrivals && arrivals.visits.some(v => ids.split(",").includes(v.entry))
+    ? `<button type="button" class="btn sm" data-arr="${ids}">${icon("arrivals")}Arrivals</button>` : "";
+  const addr = (j.job.address || "").trim();
+
+  return h`<div class="jcard${open ? " open" : ""}" data-job="${j.key}">
+    <button type="button" class="jrow" id="jb-${j.key}" aria-expanded="${open}" aria-controls="jd-${j.key}">
+      <span class="jr-main">
+        <span class="jr-top"><span class="t">${esc(j.job.name || j.entries[0].name)}</span>${nNeed ? `<span class="pill alert">${nNeed === 1 ? "Needs fitter" : `Needs ${nNeed} fitters`}</span>` : ""}</span>
+        <span class="m"><span>${esc(when)}</span>${j.job.postcode ? `<span>${esc(j.job.postcode)}</span>` : ""}${j.job.wfm ? `<span>WFM ${esc(j.job.wfm)}</span>` : ""}<span>${esc(j.job.group)}</span>${statuses.filter(s => s !== "TBC" || tbcAll).map(statusChip).join("")}</span>
+      </span>
+      <span class="jr-fit">${chips}</span>
+      ${icon("chev", "jr-chev")}
+    </button>
+    <div class="jr-more" id="jd-${j.key}"><div class="jr-in"><div class="jd">
+      ${addr && addr !== j.job.postcode ? `<p class="jd-addr">${esc(addr)}</p>` : ""}
+      <div class="jd-list">${rows}</div>
+      <div class="jd-acts">${j.job.id ? `<a class="btn sm" href="${jobLink(j.entries[0])}" target="_blank" rel="noopener">Open in monday.com${icon("ext")}</a>` : ""}${log}</div>
+    </div></div></div>
+  </div>`;
+}
+function toggleJob(btn) {
+  const card = btn.closest(".jcard"), open = !card.classList.contains("open");
+  if (open) openJobs.add(card.dataset.job); else openJobs.delete(card.dataset.job);
+  card.classList.toggle("open", open);
+  btn.setAttribute("aria-expanded", String(open));
+  // Once it has opened, bring all of it into view (above the tab bar) if it ran off the bottom.
+  if (open) setTimeout(() => { if (card.isConnected) card.scrollIntoView({ block: "nearest", behavior: FLRUI.reduced() ? "auto" : "smooth" }); }, FLRUI.reduced() ? 0 : 330);
+}
 function renderJobsBody() {
   const el = document.getElementById("viewJobs"), body = el.querySelector("#jobsBody");
   if (!data || !body) return;
   const last = days[days.length - 1];
   const q = search.trim().toLowerCase();
-  const inWindow = data.entries.filter(e => classify(e) === "job" && e.from <= last && e.to >= days[0]);
-  const found = q ? inWindow.filter(e => (e.name + " " + e.job.name + " " + e.fitters.join(" ") + " " + e.job.postcode).toLowerCase().includes(q)) : inWindow;
-  const list = jobsFilter === "unassigned" ? found.filter(e => e.fitters.length === 0) : found;
-  const nUn = inWindow.filter(e => e.fitters.length === 0).length;
+  const inWindow = jobsOf(data.entries.filter(e => classify(e) === "job" && e.from <= last && e.to >= days[0]));
+  const found = q ? inWindow.filter(j => j.text.includes(q)) : inWindow;
+  const list = jobsFilter === "unassigned" ? found.filter(j => j.needs.length) : found;
+  const nUn = inWindow.filter(j => j.needs.length).length;
   el.querySelector('[data-count="all"]').textContent = found.length;
   el.querySelector('[data-count="unassigned"]').textContent = nUn;
   setHead("Jobs", `${rangeLabel(days[0], last)} · ${nUn ? `${nUn} ${nUn === 1 ? "job needs" : "jobs need"} a fitter` : "every job has a fitter"}`);
 
-  // group by start date (jobs already running show under today)
+  // by start date (jobs already running show under today), then by name
   const byDate = new Map();
-  for (const e of list) { const k = e.from < days[0] ? days[0] : e.from; if (!byDate.has(k)) byDate.set(k, []); byDate.get(k).push(e); }
+  for (const j of list) { const k = j.from < days[0] ? days[0] : j.from; if (!byDate.has(k)) byDate.set(k, []); byDate.get(k).push(j); }
   let html = "";
-  for (const [iso, items] of [...byDate.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
-    html += `<section class="dgroup"><header class="dg-head"><h2>${fullDate(iso)}</h2>${iso === days[0] ? `<span class="tag today">Today &amp; in progress</span>` : ""}</header><div class="group">`;
-    for (const e of items) {
-      const un = e.fitters.length === 0;
-      const showParent = e.job.name && e.job.name.trim() !== e.name.trim();
-      html += h`<a class="jrow${un ? " un" : ""}" href="${jobLink(e)}" target="_blank" rel="noopener" title="Open in monday.com">
-        <span class="jr-main">
-          <span class="jr-top"><span class="t">${esc(e.name)}</span>${un ? `<span class="pill alert">Needs fitter</span>` : ""}</span>
-          ${showParent ? `<span class="p">${esc(e.job.name)}</span>` : ""}
-          <span class="m"><span>${esc(rangeLabel(e.from, e.to))}</span>${e.job.postcode ? `<span>${esc(e.job.postcode)}</span>` : ""}${e.job.wfm ? `<span>WFM ${esc(e.job.wfm)}</span>` : ""}<span>${esc(e.job.group)}</span>${statusChip(e.status)}</span>
-        </span>
-        <span class="jr-fit">${un ? `<span class="none">No fitter assigned</span>` : e.fitters.map(f => { const pf = parseLabel(f), x = faceOf(pf), a = arrMini(e.id, f); return x && x.photo ? `<span class="has-face"><img class="mini" src="${x.photo}" alt="" loading="lazy" decoding="async">${esc(pf.name)}${a}</span>` : `<span>${esc(pf.name)}${a}</span>`; }).join("")}</span>
-        ${icon("ext", "go")}
-      </a>`;
-    }
-    html += `</div></section>`;
+  for (const [iso, jobs] of [...byDate.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+    jobs.sort((a, b) => (a.job.name || "").localeCompare(b.job.name || "", "en", { sensitivity: "base", numeric: true }));
+    html += `<section class="dgroup"><header class="dg-head"><h2>${fullDate(iso)}</h2>${iso === days[0] ? `<span class="tag today">Today &amp; in progress</span>` : ""}</header>
+      <div class="group">${jobs.map(jobCard).join("")}</div></section>`;
   }
   if (!list.length) html += q ? emptyHtml("No jobs match", "Try another job, postcode or fitter.", "search")
     : jobsFilter === "unassigned" ? emptyHtml("Every job has a fitter", "Nothing in these two weeks is waiting for one.", "check")
@@ -1534,16 +1671,17 @@ function arrDetail(v) {
   const away = trips.length ? `, was away ${trips.join(" and ")},` : "";
   return v.leftAt ? `${at}${away} and left at ${ukClock(v.leftAt, true)}` : v.status === "on_site" ? `${at}${away} and is still there` : `${at}${away.replace(/,$/, "")}`;
 }
-function arrChip(day, entry, fitter) {
+// log: whose arrivals a tap shows; the Jobs view passes all of the job's subitems (ids joined with commas).
+function arrChip(day, entry, fitter, log = entry) {
   const v = arrOf(day, entry, fitter), st = arrState(v);
   if (!st) return "";
   const detail = arrDetail(v);
-  return `<span class="arr ${st.cls}" role="button" tabindex="0" data-arr="${esc(entry)}" title="${esc(detail)}" aria-label="${esc(`${st.text}. ${detail}. Show this job's arrivals`)}">${esc(st.text)}</span>`;
+  return `<span class="arr ${st.cls}" role="button" tabindex="0" data-arr="${esc(log)}" title="${esc(detail)}" aria-label="${esc(`${st.text}. ${detail}. Show this job's arrivals`)}">${esc(st.text)}</span>`;
 }
 function arrMini(entry, fitter) {
   if (!arrivals) return "";
   const v = arrOf(arrivals.today, entry, fitter), st = arrState(v);
-  return st ? `<span class="t-arr ${st.cls}" title="${esc(arrDetail(v))}">${esc(st.mini)}</span>` : "";
+  return st ? `<span class="t-arr ${st.cls}" title="${esc(arrDetail(v))}">${icon("arrivals")}<span class="sr">Arrival </span>${esc(st.mini)}</span>` : "";
 }
 async function loadArrivals() {
   clearTimeout(arrTimer);
@@ -1599,13 +1737,15 @@ function openArrivals() {
       <div id="arrList" style="display:flex;flex-direction:column;gap:18px">${arrivalsList()}</div>
     </div>`, "arrivals");
 }
+// entry: one subitem's id, or a whole job's (from the Jobs view) joined with commas.
 function openArrival(entry, back) {
   if (!arrivals) return;
   sheetKind = "arrival"; arrEntry = entry; arrBack = !!back;
-  const list = arrivals.visits.filter(v => v.entry === entry);
-  const v0 = list[0] || {}, e = data ? data.entries.find(x => x.id === entry) : null;
+  const ids = String(entry).split(",");
+  const list = arrivals.visits.filter(v => ids.includes(v.entry));
+  const v0 = list[0] || {}, e = data ? data.entries.find(x => x.id === ids[0]) : null;
   const link = e ? jobLink(e) : v0.jobId ? MONDAY_BOARD_URL + v0.jobId : "";
-  const title = v0.entryName || (e && e.name) || "Job", parent = v0.jobName || (e && e.job.name) || "";
+  const parent = v0.jobName || (e && e.job.name) || "", title = (ids.length > 1 && parent) || v0.entryName || (e && e.name) || "Job";
   const where = [v0.wfm || (e && e.job.wfm) ? `WFM ${esc(v0.wfm || e.job.wfm)}` : "", esc(v0.postcode || (e && e.job.postcode) || "")].filter(Boolean).join(" · ");
   const days = [...new Set(list.map(v => v.day))].sort().reverse();
   sheetUI.show(`<header class="dlg-head"><h2 id="sheetTitle">Arrivals</h2><button class="close" type="button" data-act="sheet-close" aria-label="Close arrivals">${icon("close")}</button></header>
@@ -1670,6 +1810,8 @@ document.addEventListener("click", ev => {
   const arow = ev.target.closest("[data-arr-open]");
   if (arow) { openArrival(arow.dataset.arrOpen, true); return; }
   if (ev.target.closest("#arrBack")) { openArrivals(); return; }
+  const jt = ev.target.closest(".jrow[aria-controls]");
+  if (jt) { toggleJob(jt); return; }
   const el = ev.target.closest("[data-act]");
   if (!el) return;
   switch (el.dataset.act) {

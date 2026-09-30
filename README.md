@@ -70,12 +70,14 @@ Open the link in Safari (iPhone) or Chrome (Android) → *Share* / menu → **Ad
 - **Refresh** asks the worker for fresh data (bypasses the 45-second cache). The page also refreshes itself when reopened after 10 minutes.
 - **Day** tab: pick a date from the strip. *Needs a fitter* is pinned at the top, then Working, Free and Unavailable. The All / Free / Working / Off control filters; search matches fitter or job names.
 - **Fitter** tab: one fitter's fortnight — good for fitters bookmarking their own view (the selection is remembered).
-- **Jobs** tab: every scheduled entry in the window, grouped by start date, unassigned ones highlighted; *Needs fitter* shows only those.
+- **Jobs** tab: each job in the window once, under the day it starts (jobs already running under today), with all its fitters together. Tap a job to open it: each person's dates, their subitem's status (*Scheduled*, or *TBC* still to be confirmed) and, for administrators, today's arrival and departure; then *Open in monday.com*. *Needs fitter* shows only jobs with a subitem that has no fitter yet.
+  - **What counts as one job:** a Work Programme item. Its subitems come together because they belong to it (the parent item's ID), so copies ("(copy)") and differently named subitems of one item show as one job, and separate items stay separate however alike their names are.
 - **Settings** (cog): theme (Auto / Light / Dark), weekends, weekend rota, FLR/Sub rows, Completed jobs.
 - **Photos and number plates**: in a browser that is signed in on the [FLR Hub](https://flrmarketing.github.io/flr-hub/) (same site), each fitter shows their staff photo and the registration FleetView has for them, as in Fleet Management. They come from the FLR database (`public.fitter_faces()`) after sign-in, never from this repository; without a Hub sign-in the page shows initials and van codes. The page loads the Hub's `flr-config.js` and `vendor/supabase-2.116.0.js` for this.
 - **Arrivals (FLR administrators only)**: when the fitter's van reached the site, from FleetView.
   - **On the job card:** "On site · Arrived 07:27" (green), "Arrived 07:37 · left 13:49", or "Arrival not confirmed" (grey outline). Hovering shows why.
   - **Tapping the label** shows that job's arrivals day by day. The location-pin button in the header lists the last 30 days.
+  - **In the Jobs tab:** each fitter's chip has today's time; an opened job has the labels and an *Arrivals* button with all its fitters' arrivals.
   - **Where it comes from:** the FLR database (`public.fitter_arrivals()`), kept up to date every two minutes by the `flr-arrivals` Edge Function (in the Cost Estimator repository, with its rules and setup).
   - **Everyone else** sees the page exactly as before.
 
