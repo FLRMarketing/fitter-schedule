@@ -1,6 +1,6 @@
 # FLR Fitter Schedule
 
-A mobile-first web app, in the same look as the [FLR Hub](https://flrmarketing.github.io/flr-hub/) (which links to it), that shows, for each of the next 14 days, which fitters are **free**, **working** or **off**, what each is working on, and which jobs on the Work Programme still **need a fitter**. It reads the Monday.com *Work Programme* board (ID 5094652880) through a small Cloudflare Worker, so no Monday token ever reaches a phone.
+A mobile-first web app, in the same look as the [FLR Hub](https://flrmarketing.github.io/flr-hub/) (which links to it), that shows, for each day from 30 days ago to 30 days ahead (the window moves on by itself every day), which fitters are **free**, **working** or **off**, what each is working on, and which jobs on the Work Programme still **need a fitter**. It reads the Monday.com *Work Programme* board (ID 5094652880) through a small Cloudflare Worker, so no Monday token ever reaches a phone.
 
 ```
 Phone / browser  ──►  GitHub Pages (index.html)  ──►  Cloudflare Worker (holds the Monday token)  ──►  monday.com API
@@ -18,11 +18,13 @@ Phone / browser  ──►  GitHub Pages (index.html)  ──►  Cloudflare Wor
 
 ## How the schedule is worked out
 
-The worker fetches every subitem on *Subitems of Work Programme* whose **Timeline end date is today or later** (so multi-day jobs that started last week still show), together with its parent job's name, group, WFM number, site address and postcode, plus the full label list of the **Fitter** dropdown (the roster). The page then does the rest:
+The worker fetches every subitem on *Subitems of Work Programme* whose **Timeline end date is on or after the `from` date** the page asks for (so multi-day jobs that started earlier still show), together with its parent job's name, group, WFM number, site address and postcode, plus the full label list of the **Fitter** dropdown (the roster).
+
+The page asks twice: from **today**, as it always has, and from **30 days ago**, which adds the subitems that had already ended. If that second request fails, ignores the date or comes back cut short (it must hold everything the first one does, and a round count such as 500 looks like a page limit), today onwards is unaffected and the earlier days say what's missing (*Not loaded*, or *Some earlier jobs may be missing*). It then does the rest:
 
 | Parent job's group | Treated as |
 |---|---|
-| Scheduling Issue, Ready to schedule, Scheduled | **Work.** A subitem with no fitter is listed under *Needs a fitter*. |
+| Scheduling Issue, Ready to schedule, Scheduled | **Work.** A subitem with no fitter is listed under *Needs a fitter* (on days already gone: *No fitter assigned*, as a record). |
 | FLR jobs (Fleet Bookings, Training) | **Work**, tagged *FLR*. Never flagged as needing a fitter. |
 | Holidays, Sickness, Unavailable & Leave | **Off** (Unavailable). |
 | National Holidays & Weekend Rota | **Off** for the fitters listed on that weekend's *Not working* entry. Can be switched off in Settings. |
@@ -68,9 +70,9 @@ Open the link in Safari (iPhone) or Chrome (Android) → *Share* / menu → **Ad
 ## Day-to-day
 
 - **Refresh** asks the worker for fresh data (bypasses the 45-second cache). The page also refreshes itself when reopened after 10 minutes.
-- **Day** tab: pick a date from the strip. *Needs a fitter* is pinned at the top, then Working, Free and Unavailable. The All / Free / Working / Off control filters; search matches fitter or job names.
-- **Fitter** tab: one fitter's fortnight — good for fitters bookmarking their own view (the selection is remembered).
-- **Jobs** tab: each job in the window once, under the day it starts (jobs already running under today), with all its fitters together. Tap a job to open it: each person's dates, their subitem's status (*Scheduled*, or *TBC* still to be confirmed) and, for administrators, today's arrival and departure; then *Open in monday.com*. *Needs fitter* shows only jobs with a subitem that has no fitter yet.
+- **Day** tab: pick a date from the strip, which runs from 30 days back to 30 days ahead, opens on today, names each new month and greys the days already gone. Swipe it on a phone; with a mouse, use the arrows at its ends; the arrow keys and Home / End work too. *Today* (or tapping *Day* again) comes back to today. *Needs a fitter* is pinned at the top, then Working, Free and Unavailable. The All / Free / Working / Off control filters; search matches fitter or job names.
+- **Fitter** tab: one fitter's days from today to 30 days ahead, with the 30 days before folded under *Earlier* — good for fitters bookmarking their own view (the selection is remembered).
+- **Jobs** tab: each job in the window once, under the day it starts (jobs already running under today; jobs already over folded under *Earlier*, which opens by itself when a search finds one), with all its fitters together. Tap a job to open it: each person's dates, their subitem's status (*Scheduled*, or *TBC* still to be confirmed) and, for administrators, today's arrival and departure; then *Open in monday.com*. *Needs fitter* shows only jobs with a subitem that has no fitter yet and isn't over.
   - **What counts as one job:** a Work Programme item. Its subitems come together because they belong to it (the parent item's ID), so copies ("(copy)") and differently named subitems of one item show as one job, and separate items stay separate however alike their names are.
 - **Settings** (cog): theme (Auto / Light / Dark), weekends, weekend rota, FLR/Sub rows, Completed jobs.
 - **Photos and number plates**: in a browser that is signed in on the [FLR Hub](https://flrmarketing.github.io/flr-hub/) (same site), each fitter shows their staff photo and the registration FleetView has for them, as in Fleet Management. They come from the FLR database (`public.fitter_faces()`) after sign-in, never from this repository; without a Hub sign-in the page shows initials and van codes. The page loads the Hub's `flr-config.js` and `vendor/supabase-2.116.0.js` for this.

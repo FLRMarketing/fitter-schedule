@@ -317,6 +317,20 @@ input.input[type="search"]{padding-left:34px;background-repeat:no-repeat;backgro
 .day[aria-selected="true"] .dot{box-shadow:0 0 0 1.5px var(--on-tint)}
 .day:focus-visible{outline-offset:2px}
 .day-thumb{position:absolute;z-index:1;top:4px;bottom:10px;left:0;width:0;border-radius:var(--r-day);background:var(--tint-fill);box-shadow:var(--sh-pick);pointer-events:none}
+/* 30 days back and 30 ahead: the first day of each month shows the month, past days are quieter, and with a mouse
+   two arrows scroll the strip along (touch screens swipe it) */
+.day .dow.mo{color:var(--tint);font-weight:700}
+.day[aria-selected="true"] .dow.mo{color:var(--on-tint)}
+.day.past>*{opacity:.5}
+.day.past[aria-selected="true"]>*{opacity:1}
+.strip-go{display:none}
+@media (hover:hover) and (pointer:fine){
+  .strip-go{position:absolute;z-index:3;top:50%;display:grid;width:30px;height:30px;margin-top:-17px;background:var(--raised);box-shadow:var(--sh-float);transition:opacity .2s,transform .28s var(--ease)}
+  .strip-go .ico{width:16px;height:16px}
+  .strip-go.prev{left:calc(var(--gutter) * -1 + 6px)}
+  .strip-go.next{right:calc(var(--gutter) * -1 + 6px)}
+  .strip.at-start .strip-go.prev,.strip.at-end .strip-go.next{opacity:0;pointer-events:none}
+}
 
 /* ---------------------------------------------------------------- sections, rows and job blocks */
 .sect{margin:0 0 26px}   /* jumps land below the bar and the stuck strip: html scroll-padding-top */
@@ -451,7 +465,7 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
 .jcard.open .jr-chev{transform:rotate(90deg)}
 /* the opened part: its height eases open (0fr to 1fr); shut, it's hidden from taps, the tab key and screen readers */
 .jr-more{display:grid;grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows .32s var(--ease),visibility 0s linear .32s}
-.jcard.open .jr-more{grid-template-rows:1fr;visibility:visible;transition:grid-template-rows .32s var(--ease),visibility 0s}
+.jcard.open .jr-more,.early.open>.jr-more{grid-template-rows:1fr;visibility:visible;transition:grid-template-rows .32s var(--ease),visibility 0s}
 .jr-in{min-height:0;overflow:hidden}
 .jd{display:flex;flex-direction:column;gap:10px;padding:0 16px 16px}
 .jd-addr{font-size:13px;line-height:1.4;color:var(--ink-2);overflow-wrap:anywhere}
@@ -481,7 +495,25 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
   .jp .avatar{grid-row:auto}
   .jp-who{min-height:0}
 }
-@media (prefers-reduced-motion:reduce){.jr-chev,.jr-more,.jcard.open .jr-more{transition:none}}
+/* Earlier: the 30 days before today, folded away until wanted (Fitter and Jobs) */
+.early{margin:0 0 20px}
+.early-head{display:flex;align-items:center;gap:12px;width:100%;min-height:54px;margin:0;padding:11px 16px;border:0;border-radius:var(--r-card);background:var(--surface);
+  box-shadow:var(--sh-card);color:inherit;font:inherit;text-align:left;-webkit-tap-highlight-color:transparent;transition:background-color .15s}
+@media (hover:hover){.early-head:hover{background:var(--row-hover)}}
+.early-head:active{background:var(--fill-2);transition-duration:0s}
+.early-head:focus-visible{outline-offset:2px}
+.early-head .tx{display:flex;flex-direction:column;gap:1px;flex:1 1 auto;min-width:0}
+.early-head b{font:600 15px/1.3 var(--font-text);letter-spacing:-.012em}
+.early-head small{font-size:13px;line-height:1.35;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.early-head .jr-chev{flex:none}
+.early.open .early-head .jr-chev{transform:rotate(90deg)}
+.early .jr-in>:first-child{margin-top:14px}
+.early .dgroup:last-child{margin-bottom:4px}
+.early-note{margin:0 4px 10px;font-size:13px;line-height:1.4;color:var(--ink-3)}
+.jf.none.past{background:var(--fill);color:var(--ink-2)}
+.jp.need.past .jp-who b{color:var(--ink-2)}
+.avatar.need.past{background:var(--fill);color:var(--ink-3)}
+@media (prefers-reduced-motion:reduce){.jr-chev,.jr-more,.jcard.open .jr-more,.early.open>.jr-more{transition:none}}
 
 /* ---------------------------------------------------------------- footer */
 .foot{margin:34px 0 0;padding-top:14px;border-top:var(--hair) solid var(--sep);font-size:12.5px;line-height:1.6;color:var(--ink-3);text-align:center;font-variant-numeric:tabular-nums}
@@ -644,8 +676,10 @@ button.arow:active{background:var(--fill)}
       <p class="status" id="status" data-tone="busy">Loading…</p>
     </header>
     <div class="alerts" id="notice"></div>
-    <div class="strip" id="stripBar">
+    <div class="strip at-start" id="stripBar">
+      <button class="iconbtn strip-go prev" type="button" data-act="strip-prev" aria-label="Show earlier days" tabindex="-1"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-back"/></svg></button>
       <div class="days" id="days" role="tablist" aria-label="Pick a day"></div>
+      <button class="iconbtn strip-go next" type="button" data-act="strip-next" aria-label="Show later days" tabindex="-1"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-chev"/></svg></button>
     </div>
     <section id="viewDay" role="tabpanel" aria-labelledby="tab-day"></section>
     <section id="viewFitter" role="tabpanel" aria-labelledby="tab-fitter" hidden></section>
@@ -1086,7 +1120,7 @@ function statePill(d) {
 function flagPills(d) { return d.flags.map(x => `<span class="pill flag">${esc(x.name)}</span>`).join(""); }
 function jobBlock(e, opts = {}) {
   const k = classify(e);
-  const cls = k === "off" ? "offjob" : k === "flr" ? "flr" : (e.fitters.length === 0 ? "unassigned" : "");
+  const cls = k === "off" ? "offjob" : k === "flr" ? "flr" : (e.fitters.length === 0 && e.to >= TODAY ? "unassigned" : "");
   const others = opts.me ? e.fitters.filter(f => f !== opts.me).map(shortName) : [];
   const showParent = e.job.name && e.job.name.trim() !== e.name.trim();
   return h`<a class="job ${cls}" href="${jobLink(e)}" target="_blank" rel="noopener" title="Open in monday.com">
@@ -1149,15 +1183,28 @@ function placeThumb(instant) {
 }
 function renderDays() {
   const el = document.getElementById("days");
-  el.innerHTML = `<span class="day-thumb" aria-hidden="true"></span>` + days.filter(d => settings.showWeekends || !dparts(d).wk).map(d => {
-    const p = dparts(d), s = data ? dayStats(d) : null;
-    const cls = ["day", p.wk ? "weekend" : "", d === days[0] ? "today" : "", p.dow === "Mon" ? "mon" : ""].filter(Boolean).join(" ");
+  const shown = days.filter(d => settings.showWeekends || !dparts(d).wk);
+  el.innerHTML = `<span class="day-thumb" aria-hidden="true"></span>` + shown.map((d, i) => {
+    // Free and needs-a-fitter dots look ahead, so past days don't get them; a new month shows its name over the date.
+    const p = dparts(d), past = d < TODAY, s = data && !past ? dayStats(d) : null, mo = i === 0 || d.slice(0, 7) !== shown[i - 1].slice(0, 7);
+    const cls = ["day", p.wk ? "weekend" : "", d === TODAY ? "today" : "", past ? "past" : "", p.dow === "Mon" ? "mon" : ""].filter(Boolean).join(" ");
     const mini = `<span class="mini" aria-hidden="true">${s && s.unassigned ? '<i class="dot alert"></i>' : ""}${s && s.free ? '<i class="dot"></i>' : ""}</span>`;
-    return `<button type="button" class="${cls}" role="tab" aria-selected="${d === selDay}" tabindex="${d === selDay ? 0 : -1}" data-day="${d}" aria-label="${longDate(d)}${s ? `, ${s.free} free, ${s.unassigned} need a fitter` : ""}">
-      <span class="dow">${p.dow}</span><span class="num">${p.num}</span>${mini}</button>`;
+    return `<button type="button" class="${cls}" role="tab" aria-selected="${d === selDay}" tabindex="${d === selDay ? 0 : -1}" data-day="${d}" aria-label="${longDate(d)}${d === TODAY ? ", today" : ""}${s ? `, ${s.free} free, ${s.unassigned} need a fitter` : ""}">
+      <span class="dow${mo ? " mo" : ""}">${mo ? p.mon : p.dow}</span><span class="num">${p.num}</span>${mini}</button>`;
   }).join("");
   stripThumb = FLRUI.Thumb(el.querySelector(".day-thumb"));
   if (!document.getElementById("stripBar").hidden) { placeThumb(true); revealDay(selectedDayButton(), false); }
+  syncStripEnds();
+}
+// With a mouse, the arrows at either end of the strip scroll it most of a width at a time; each hides at its end.
+function syncStripEnds() {
+  const strip = document.getElementById("days"), bar = document.getElementById("stripBar");
+  bar.classList.toggle("at-start", strip.scrollLeft <= 2);
+  bar.classList.toggle("at-end", strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 2);
+}
+function scrollStrip(dir) {
+  const strip = document.getElementById("days");
+  strip.scrollBy({ left: dir * Math.max(strip.clientWidth * .8, 120), behavior: FLRUI.reduced() ? "auto" : "smooth" });
 }
 function selectDay(d, o = {}) {
   if (!d || d === selDay) return;
@@ -1184,21 +1231,30 @@ function renderDay() {
           `<label><input type="radio" name="dayFilter" value="${k}" ${dayFilter === k ? "checked" : ""}>${k !== "all" ? `<i class="sw ${k}" aria-hidden="true"></i>` : ""}<span>${label}</span><b data-count="${k}"></b></label>`).join("")}</fieldset>
         <input class="input search" id="searchDay" type="search" placeholder="Search fitter or job" value="${esc(search)}" aria-label="Search" autocomplete="off">
         <button class="needs" type="button" data-act="needs" hidden><i class="sw alert" aria-hidden="true"></i>Needs fitter <b></b></button>
+        <button class="btn sm" type="button" data-act="today" hidden>Today</button>
       </div>
       <div id="dayBody"></div>`;
     FLRUI.initSeg(el.querySelector("#dayFilter"));
   }
-  const iso = selDay, s = dayStats(iso);
-  const rel = iso === days[0] ? "Today" : iso === days[1] ? "Tomorrow" : "";
-  setHead(fullDate(iso), [rel, s.unassigned ? `${s.unassigned} ${s.unassigned === 1 ? "job needs" : "jobs need"} a fitter` : ""].filter(Boolean).join(" · "), longDate(iso));
+  const iso = selDay, s = dayStats(iso), past = iso < TODAY;
+  const n = Math.round((Date.parse(iso) - Date.parse(TODAY)) / 864e5);
+  const rel = n === 0 ? "Today" : n === 1 ? "Tomorrow" : n === -1 ? "Yesterday" : n > 1 ? `In ${n} days` : `${-n} days ago`;
+  setHead(fullDate(iso), [rel, !past && s.unassigned ? `${s.unassigned} ${s.unassigned === 1 ? "job needs" : "jobs need"} a fitter` : ""].filter(Boolean).join(" · "), longDate(iso));
+  el.querySelector('[data-act="today"]').hidden = iso === TODAY;
   renderDayBody();
 }
 function renderDayBody() {
   const el = document.getElementById("viewDay"), body = el.querySelector("#dayBody");
   if (!data || !body) return;
-  const iso = selDay, s = dayStats(iso);
+  const iso = selDay, s = dayStats(iso), past = iso < TODAY;
   const q = search.trim().toLowerCase();
   const matches = f => !q || f.name.toLowerCase().includes(q) || f.label.toLowerCase().includes(q);
+  if (!loaded(iso)) {   // before the first day the data covers: say so rather than show everyone as free
+    for (const [k] of DAY_FILTERS) el.querySelector(`[data-count="${k}"]`).textContent = "";
+    el.querySelector(".needs").hidden = true;
+    body.innerHTML = emptyHtml("Not loaded", `The schedule here starts on ${longDate(data.from)}. ${data.past === "error" ? "Earlier days couldn't be fetched; press Refresh to try again." : "Earlier days aren't available."}`, "day");
+    return;
+  }
 
   const unassigned = entriesOn(iso).filter(e => classify(e) === "job" && e.fitters.length === 0)
     .filter(e => !q || e.name.toLowerCase().includes(q) || e.job.name.toLowerCase().includes(q));
@@ -1210,13 +1266,16 @@ function renderDayBody() {
   ];
   for (const [k] of DAY_FILTERS) el.querySelector(`[data-count="${k}"]`).textContent = k === "all" ? rows.length : s[k];
   const nb = el.querySelector(".needs");
-  nb.hidden = !s.unassigned;
+  nb.hidden = past || !s.unassigned;
   nb.querySelector("b").textContent = s.unassigned;
   nb.setAttribute("aria-label", `${s.unassigned} ${s.unassigned === 1 ? "job needs" : "jobs need"} a fitter: show them`);
 
   let html = "";
   if (unassigned.length && (dayFilter === "all" || dayFilter === "busy")) {
-    html += `<section class="sect alert" id="needs"><header class="sect-head"><h2><i class="sw alert" aria-hidden="true"></i>Needs a fitter</h2><span class="cnt">${unassigned.length}</span></header>
+    html += past   // on a day that's gone it's a record, not a call to action
+      ? `<section class="sect"><header class="sect-head"><h2><i class="sw off" aria-hidden="true"></i>No fitter assigned</h2><span class="cnt">${unassigned.length}</span></header>
+      <div class="group pad"><div class="jobs">${unassigned.map(e => jobBlock(e)).join("")}</div></div></section>`
+      : `<section class="sect alert" id="needs"><header class="sect-head"><h2><i class="sw alert" aria-hidden="true"></i>Needs a fitter</h2><span class="cnt">${unassigned.length}</span></header>
       <div class="group pad"><div class="jobs">${unassigned.map(e => jobBlock(e)).join("")}</div></div></section>`;
   }
   for (const g of groups) {
@@ -1250,34 +1309,53 @@ function showNeeds() {
 }
 
 /* ---------- Fitter view ---------- */
+// Today and the 30 days after it as a list; the 30 days before it folded under "Earlier" (open it to look back).
+const earlyOpen = { fitter: false, jobs: false };
+const tallyOf = c => `${c.busy} working · ${c.free} free · ${c.off} off`;
+function earlyFold(kind, title, sub, inner, force) {
+  const open = force || earlyOpen[kind];
+  return `<div class="early${open ? " open" : ""}" data-early="${kind}">
+    <button type="button" class="early-head" id="eh-${kind}" aria-expanded="${open}" aria-controls="ef-${kind}"><span class="tx"><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ""}</span>${icon("chev", "jr-chev")}</button>
+    <div class="jr-more" id="ef-${kind}"><div class="jr-in">${inner}</div></div>
+  </div>`;
+}
+// What the earlier days are missing, if anything: none before data.from, or possibly some if the list came back cut short.
+function earlyNote() {
+  if (!data) return "";
+  if (data.past === "partial") return `<p class="early-note">Some earlier jobs may be missing: the schedule came back shortened. Refresh to try again.</p>`;
+  return days[0] < (data.from || TODAY) ? `<p class="early-note">Nothing before ${esc(longDate(data.from || TODAY))} is loaded${data.past === "error" ? " (press Refresh to try again)" : ""}.</p>` : "";
+}
 function renderFitter() {
   const el = document.getElementById("viewFitter");
   if (!data) return;
   const list = roster();
   if (!list.some(f => f.label === selFitter)) selFitter = list[0] ? list[0].label : "";
   const me = list.find(f => f.label === selFitter);
-  const count = { busy: 0, free: 0, off: 0 };
-  let rows = "";
+  const count = { busy: 0, free: 0, off: 0 }, before = { busy: 0, free: 0, off: 0 };
+  let rows = "", early = "";
   for (const iso of days) {
-    const p = dparts(iso);
+    const p = dparts(iso), past = iso < TODAY;
     if (!settings.showWeekends && p.wk) continue;
+    if (past && !loaded(iso)) continue;
     const d = fitterDay(selFitter, iso);
-    count[d.state]++;
+    (past ? before : count)[d.state]++;
     const items = [...d.jobs, ...d.flr, ...d.off];
-    rows += h`<article class="drow ${d.clash ? "clash" : d.state}${p.wk ? " weekend" : ""}${iso === days[0] ? " today" : ""}">
+    const row = h`<article class="drow ${d.clash ? "clash" : d.state}${p.wk ? " weekend" : ""}${iso === TODAY ? " today" : ""}">
       <div class="dtile" aria-label="${fullDate(iso)}"><small>${p.dow}</small><b>${p.num}</b><small>${p.mon}</small></div>
-      <div class="dstate">${statePill(d)}${iso === days[0] ? `<span class="tag today">Today</span>` : ""}${flagPills(d)}</div>
+      <div class="dstate">${statePill(d)}${iso === TODAY ? `<span class="tag today">Today</span>` : ""}${flagPills(d)}</div>
       ${items.length ? `<div class="jobs">${items.map(e => jobBlock(e, { me: selFitter, day: iso })).join("")}</div>` : ""}
     </article>`;
+    if (past) early += row; else rows += row;
   }
+  const back = before.busy + before.free + before.off;
   el.innerHTML = h`<div class="toolbar"><div class="fid">${me ? avatar(me) : ""}<label class="picker" for="fitterSel"><span class="sr">Choose a fitter</span><select class="input" id="fitterSel" aria-label="Choose a fitter">
       ${list.map(f => { const van = regOf(f) || f.van; return `<option value="${esc(f.label)}" ${f.label === selFitter ? "selected" : ""}>${esc(f.name)}${van ? " · " + esc(van) : ""}${f.kind === "flr" ? " (FLR)" : f.kind === "sub" ? " (Sub)" : ""}</option>`; }).join("")}
     </select></label></div>${me ? vanTag(me) : ""}</div>
+    ${earlyFold("fitter", "Earlier", back ? `${rangeLabel(addDays(TODAY, -DAYS_BACK), addDays(TODAY, -1))} · ${tallyOf(before)}` : "Nothing loaded before today", earlyNote() + (early ? `<div class="group">${early}</div>` : ""))}
     <div class="group" id="fitterDays">${rows}</div>`;
   const van = me ? regOf(me) || me.van : "";
   const who = me ? [van ? `Van ${van}` : "", me.kind === "flr" ? "FLR staff" : me.kind === "sub" ? "Subcontractor" : ""].filter(Boolean).join(" · ") : "";
-  const tally = `${count.busy} working · ${count.free} free · ${count.off} off`;
-  setHead(me ? me.name : "Fitter", [who, tally].filter(Boolean).join(" · "));
+  setHead(me ? me.name : "Fitter", [who, `From today: ${tallyOf(count)}`].filter(Boolean).join(" · "));
 }
 
 /* ---------- Jobs view ---------- */
@@ -1328,12 +1406,13 @@ function jobsOf(entries) {
   return [...m.values()].map(j => {
     j.entries.sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to));
     j.spans = spansOf(j.entries);
-    j.from = j.spans[0].from;
+    j.from = j.spans[0].from; j.to = j.spans[j.spans.length - 1].to;
     const people = new Map();
     for (const e of j.entries) for (const f of e.fitters) { if (!people.has(f)) people.set(f, []); people.get(f).push(e); }
     j.people = [...people].map(([label, list]) => ({ label, f: parseLabel(label), entries: list }))
       .sort((a, b) => a.entries[0].from.localeCompare(b.entries[0].from) || a.f.name.localeCompare(b.f.name));
     j.needs = j.entries.filter(e => !e.fitters.length);
+    j.waiting = j.needs.filter(e => e.to >= TODAY);   // still to come: a fitter is wanted; one that's over is only a record
     j.text = [j.job.name, j.job.postcode, j.job.wfm, ...j.entries.map(e => e.name), ...j.people.map(p => p.label)].join(" ").toLowerCase();
     return j;
   });
@@ -1359,18 +1438,18 @@ function bookedChip(st) {
   return st === "Scheduled" ? `<span class="st ok">Scheduled</span>` : st === "TBC" ? `<span class="st tbc" title="To be confirmed">TBC</span>` : statusChip(st);
 }
 function jobCard(j) {
-  const open = openJobs.has(j.key), nNeed = j.needs.length, when = spansLabel(j.spans);
+  const open = openJobs.has(j.key), nNeed = j.waiting.length, when = spansLabel(j.spans);
   // TBC once for the job when every status set on it is TBC; otherwise on the chip of each person with a TBC booking
   const statuses = [...new Set(j.entries.map(e => e.status))], set = statuses.filter(s => s && s !== "Default");
   const tbcAll = set.length === 1 && set[0] === "TBC";
   const ids = j.entries.map(e => e.id).join(",");
-  const today = arrivals ? arrivals.today : days[0];
+  const today = arrivals ? arrivals.today : TODAY;
   const chips = j.people.map(p => {
     const x = faceOf(p.f), mine = spansLabel(spansOf(p.entries));
     const tbc = !tbcAll && p.entries.some(e => e.status === "TBC");
     const arr = p.entries.map(e => arrMini(e.id, p.label)).find(Boolean) || "";
     return `<span class="jf${x && x.photo ? " has-face" : ""}">${x && x.photo ? `<img class="mini" src="${x.photo}" alt="" loading="lazy" decoding="async">` : ""}<span class="tx"><span>${esc(p.f.name)}</span>${mine !== when ? ` <span class="d">${esc(mine)}</span>` : ""}${tbc ? ` <span class="tbc">TBC</span>` : ""}${arr ? " " + arr : ""}</span></span>`;
-  }).join("") || `<span class="jf none">No fitter assigned</span>`;
+  }).join("") || `<span class="jf none${nNeed ? "" : " past"}">No fitter assigned</span>`;
 
   const bk = (e, who) => {
     const n = subName(e), a = who && overlaps(e, today) ? arrChip(today, e.id, who, ids) : "";
@@ -1378,7 +1457,7 @@ function jobCard(j) {
   };
   const rows = j.people.map(p => `<div class="jp">${avatar(p.f)}<div class="jp-who"><b>${esc(p.f.name)}</b>${vanTag(p.f)}${kindChip(p.f)}</div>
       <div class="jp-bks">${p.entries.map(e => bk(e, p.label)).join("")}</div></div>`).join("")
-    + j.needs.map(e => `<div class="jp need"><span class="avatar need" aria-hidden="true">?</span><div class="jp-who"><b>No fitter assigned</b></div>
+    + j.needs.map(e => `<div class="jp need${e.to < TODAY ? " past" : ""}"><span class="avatar need${e.to < TODAY ? " past" : ""}" aria-hidden="true">?</span><div class="jp-who"><b>No fitter assigned</b></div>
       <div class="jp-bks">${bk(e, "")}</div></div>`).join("");
   const log = arrivals && arrivals.visits.some(v => ids.split(",").includes(v.entry))
     ? `<button type="button" class="btn sm" data-arr="${ids}">${icon("arrivals")}Arrivals</button>` : "";
@@ -1400,6 +1479,12 @@ function jobCard(j) {
     </div></div></div>
   </div>`;
 }
+function toggleEarly(btn) {
+  const fold = btn.closest(".early"), open = !fold.classList.contains("open");
+  earlyOpen[fold.dataset.early] = open;
+  fold.classList.toggle("open", open);
+  btn.setAttribute("aria-expanded", String(open));
+}
 function toggleJob(btn) {
   const card = btn.closest(".jcard"), open = !card.classList.contains("open");
   if (open) openJobs.add(card.dataset.job); else openJobs.delete(card.dataset.job);
@@ -1415,24 +1500,33 @@ function renderJobsBody() {
   const q = search.trim().toLowerCase();
   const inWindow = jobsOf(data.entries.filter(e => classify(e) === "job" && e.from <= last && e.to >= days[0]));
   const found = q ? inWindow.filter(j => j.text.includes(q)) : inWindow;
-  const list = jobsFilter === "unassigned" ? found.filter(j => j.needs.length) : found;
-  const nUn = inWindow.filter(j => j.needs.length).length;
+  const list = jobsFilter === "unassigned" ? found.filter(j => j.waiting.length) : found;
+  const nUn = inWindow.filter(j => j.waiting.length).length;
   el.querySelector('[data-count="all"]').textContent = found.length;
   el.querySelector('[data-count="unassigned"]').textContent = nUn;
   setHead("Jobs", `${rangeLabel(days[0], last)} · ${nUn ? `${nUn} ${nUn === 1 ? "job needs" : "jobs need"} a fitter` : "every job has a fitter"}`);
 
-  // by start date (jobs already running show under today), then by name
-  const byDate = new Map();
-  for (const j of list) { const k = j.from < days[0] ? days[0] : j.from; if (!byDate.has(k)) byDate.set(k, []); byDate.get(k).push(j); }
+  // Jobs already over go under "Earlier" (open while searching); the rest by start date, those already running under
+  // today; within a day by name.
+  const byName = (a, b) => (a.job.name || "").localeCompare(b.job.name || "", "en", { sensitivity: "base", numeric: true });
+  const groups = (jobs, first, today) => {
+    const byDate = new Map();
+    for (const j of jobs) { const k = j.from < first ? first : j.from; if (!byDate.has(k)) byDate.set(k, []); byDate.get(k).push(j); }
+    return [...byDate.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([iso, js]) =>
+      `<section class="dgroup"><header class="dg-head"><h2>${fullDate(iso)}</h2>${iso === today ? `<span class="tag today">Today &amp; in progress</span>` : ""}</header>
+      <div class="group">${js.sort(byName).map(jobCard).join("")}</div></section>`).join("");
+  };
+  const over = list.filter(j => j.to < TODAY), ahead = list.filter(j => j.to >= TODAY);
   let html = "";
-  for (const [iso, jobs] of [...byDate.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
-    jobs.sort((a, b) => (a.job.name || "").localeCompare(b.job.name || "", "en", { sensitivity: "base", numeric: true }));
-    html += `<section class="dgroup"><header class="dg-head"><h2>${fullDate(iso)}</h2>${iso === days[0] ? `<span class="tag today">Today &amp; in progress</span>` : ""}</header>
-      <div class="group">${jobs.map(jobCard).join("")}</div></section>`;
+  if (jobsFilter !== "unassigned" && (over.length || !q)) {
+    html += earlyFold("jobs", "Earlier", over.length ? `${over.length} ${over.length === 1 ? "job" : "jobs"} finished ${rangeLabel(days[0], addDays(TODAY, -1))}` : "No jobs finished in the last 30 days",
+      earlyNote() + groups(over, days[0], ""), !!q && over.length > 0);
   }
+  html += groups(ahead, TODAY, TODAY);
   if (!list.length) html += q ? emptyHtml("No jobs match", "Try another job, postcode or fitter.", "search")
-    : jobsFilter === "unassigned" ? emptyHtml("Every job has a fitter", "Nothing in these two weeks is waiting for one.", "check")
+    : jobsFilter === "unassigned" ? emptyHtml("Every job has a fitter", "Nothing from today on is waiting for one.", "check")
     : emptyHtml("No jobs match", "", "search");
+  else if (!ahead.length) html += emptyHtml(q ? "Nothing from today on matches" : "No jobs from today on", "", q ? "search" : "jobs");
   body.innerHTML = html;
 }
 
@@ -1479,7 +1573,11 @@ function renderAll() {
 }
 function goTab(v) {
   if (!VIEW_IDS[v]) return;
-  if (v === view) { window.scrollTo({ top: 0, behavior: FLRUI.reduced() ? "auto" : "smooth" }); return; }
+  if (v === view) {   // the tab again: back to the top, and in the Day view back to today
+    window.scrollTo({ top: 0, behavior: FLRUI.reduced() ? "auto" : "smooth" });
+    if (v === "day" && data && selDay !== TODAY) selectDay(TODAY);
+    return;
+  }
   scrollByView[view] = window.scrollY;
   view = v; store.set("view", view); search = "";
   if (data) renderAll(); else { syncTabs(); for (const [k, id] of Object.entries(VIEW_IDS)) document.getElementById(id).hidden = k !== view; document.getElementById("stripBar").hidden = true; renderIdle(); }
@@ -1512,23 +1610,34 @@ function syncStrip() {
   nav.classList.toggle("merged", stuck);
 }
 
-/* ---------- data ---------- */
+/* ---------- data: 30 days back to 30 days ahead, rolling on each day ---------- */
+const DAYS_BACK = 30, DAYS_FORWARD = 30;
+let TODAY = "";   // London's date when the days were last built; days[] runs from TODAY - 30 to TODAY + 30
 function workerBase() {
   const qp = new URLSearchParams(location.search).get("worker");
   if (qp) store.set("workerUrl", qp);
   return (store.get("workerUrl", "") || WORKER_URL).replace(/\/$/, "");
 }
+// The worker sends every subitem whose Timeline ends on or after ?from=. Today onwards is asked for exactly as before;
+// a second request starting 30 days back adds the subitems that had already ended. If that one fails, ignores the date
+// or comes back cut short (it must hold everything the first one does), today onwards is unaffected and the earlier
+// days say what's missing (data.past: "ok", "partial", "none" or "error").
 async function load(fresh) {
   const key = store.get("key", "");
   if (!key) { openSheet("key"); return; }
   const btn = document.getElementById("refreshBtn");
   btn.classList.add("spinning"); btn.disabled = true; setStatus("Updating…");
-  try {
-    const today = londonToday();
-    const res = await fetch(`${workerBase()}/schedule?from=${today}${fresh ? "&fresh=1" : ""}`, { headers: { "X-App-Key": key }, cache: "no-store" });
-    if (res.status === 401) { store.set("key", ""); notice("The passcode was not accepted. <button class='link' id='retryKey'>Enter it again</button>", "err"); document.getElementById("retryKey").onclick = () => openSheet("key"); setStatus("Not signed in"); return; }
+  const get = async from => {
+    const res = await fetch(`${workerBase()}/schedule?from=${from}${fresh ? "&fresh=1" : ""}`, { headers: { "X-App-Key": key }, cache: "no-store" });
+    if (res.status === 401) return 401;
     if (!res.ok) { let msg = `Error ${res.status}`; try { msg = (await res.json()).error || msg; } catch {} throw new Error(msg); }
-    data = await res.json();
+    return res.json();
+  };
+  try {
+    const today = londonToday(), back = addDays(today, -DAYS_BACK);
+    const [now, before] = await Promise.all([get(today), get(back).catch(() => null)]);
+    if (now === 401) { store.set("key", ""); notice("The passcode was not accepted. <button class='link' id='retryKey'>Enter it again</button>", "err"); document.getElementById("retryKey").onclick = () => openSheet("key"); setStatus("Not signed in"); return; }
+    data = withPast(now, before === 401 ? null : before, today, back);
     data.fetchedAt = new Date().toISOString();
     store.set("cache", data);
     buildDays(today);
@@ -1545,10 +1654,30 @@ async function load(fresh) {
     btn.classList.remove("spinning"); btn.disabled = false;
   }
 }
-function buildDays(today) {
-  days = Array.from({ length: DAYS_AHEAD }, (_, i) => addDays(today, i));
-  if (!selDay || !days.includes(selDay)) selDay = days[0];
+function withPast(now, before, today, back) {
+  const got = before && Array.isArray(before.entries) ? before.entries : null;
+  const theirs = new Set(got ? got.map(e => e.id) : []), mine = new Set(now.entries.map(e => e.id));
+  const ended = got ? got.filter(e => e.to < today && !mine.has(e.id)) : [];
+  // Cut short shows as subitems from today on missing from it, or a round count (a page limit such as 500).
+  const short = !now.entries.every(e => theirs.has(e.id)) || (got && got.length >= 100 && got.length % 100 === 0);
+  const state = !got ? "error" : !ended.length ? "none" : short ? "partial" : "ok";
+  return Object.assign({}, now, { from: ended.length ? back : now.from, entries: [...ended, ...now.entries], past: state });
 }
+// The days on show; the selection stays on today unless another day was picked.
+function buildDays(today) {
+  const onToday = !selDay || selDay === TODAY;
+  TODAY = today;
+  days = Array.from({ length: DAYS_BACK + 1 + DAYS_FORWARD }, (_, i) => addDays(today, i - DAYS_BACK));
+  if (onToday || !days.includes(selDay)) selDay = today;
+}
+// Days before the first one the data covers (data.from) have no jobs loaded, so nobody is shown as free on them.
+const loaded = iso => !!data && iso >= (data.from || TODAY);
+// After midnight (or coming back to the page the next day) the window moves on and today is reloaded.
+function rollDay() {
+  if (!data || window.FLR_EMBEDDED || !TODAY || londonToday() === TODAY) return;
+  buildDays(londonToday()); renderAll(); load(false);
+}
+setInterval(rollDay, 60000);   // coming back to the page later reloads anyway (after 10 minutes), and that rebuilds the days
 
 /* ---------- sheet (passcode / settings) ---------- */
 let sheetKind = null;
@@ -1791,6 +1920,7 @@ document.getElementById("tabs").addEventListener("keydown", ev => {
   list[j].focus();
 });
 document.getElementById("days").addEventListener("click", ev => { const b = ev.target.closest("[data-day]"); if (b) selectDay(b.dataset.day); });
+document.getElementById("days").addEventListener("scroll", syncStripEnds, { passive: true });
 document.getElementById("days").addEventListener("keydown", ev => {
   if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(ev.key)) return;
   const list = [...document.querySelectorAll("#days .day")];
@@ -1812,6 +1942,8 @@ document.addEventListener("click", ev => {
   if (ev.target.closest("#arrBack")) { openArrivals(); return; }
   const jt = ev.target.closest(".jrow[aria-controls]");
   if (jt) { toggleJob(jt); return; }
+  const eh = ev.target.closest(".early-head");
+  if (eh) { toggleEarly(eh); return; }
   const el = ev.target.closest("[data-act]");
   if (!el) return;
   switch (el.dataset.act) {
@@ -1819,6 +1951,9 @@ document.addEventListener("click", ev => {
     case "sheet-scrim": if (canDismissSheet()) closeSheet(); break;
     case "key": openSheet("key"); break;
     case "needs": showNeeds(); break;
+    case "today": selectDay(TODAY); break;
+    case "strip-prev": scrollStrip(-1); break;
+    case "strip-next": scrollStrip(1); break;
     default: break;
   }
 });
@@ -1842,7 +1977,7 @@ document.addEventListener("keydown", ev => {
   if (ev.key === "Escape" && sheetUI.open && canDismissSheet()) { ev.preventDefault(); closeSheet(); }
   if (ev.key === "Enter" && ev.target.id === "keyInput") { ev.preventDefault(); saveKey(); }
 });
-try { new ResizeObserver(() => { placeThumb(true); syncStrip(); }).observe(document.getElementById("days")); } catch (e) { /* no ResizeObserver */ }
+try { new ResizeObserver(() => { placeThumb(true); syncStrip(); syncStripEnds(); }).observe(document.getElementById("days")); } catch (e) { /* no ResizeObserver */ }
 syncTabs();
 for (const [v, id] of Object.entries(VIEW_IDS)) document.getElementById(id).hidden = v !== view;
 document.getElementById("stripBar").hidden = true;
