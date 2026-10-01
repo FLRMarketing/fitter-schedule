@@ -1613,10 +1613,17 @@ function syncStrip() {
 /* ---------- data: 30 days back to 30 days ahead, rolling on each day ---------- */
 const DAYS_BACK = 30, DAYS_FORWARD = 30;
 let TODAY = "";   // London's date when the days were last built; days[] runs from TODAY - 30 to TODAY + 30
+// The schedule comes only from FLR's worker, and the team passcode goes with every request, so the page never takes a
+// worker address from a link, and forgets one an older version kept from a link (it saved them for good). Only a copy
+// opened on this computer may use a local test worker: ?worker=http://localhost:8123/test (README, Local testing).
+const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\])$/;
 function workerBase() {
-  const qp = new URLSearchParams(location.search).get("worker");
-  if (qp) store.set("workerUrl", qp);
-  return (store.get("workerUrl", "") || WORKER_URL).replace(/\/$/, "");
+  try { localStorage.removeItem("flr.workerUrl"); } catch {}
+  let local = "";
+  if (LOCAL_HOST.test(location.hostname)) {
+    try { const u = new URL(new URLSearchParams(location.search).get("worker") || ""); if (/^https?:$/.test(u.protocol) && LOCAL_HOST.test(u.hostname)) local = u.href; } catch {}
+  }
+  return (local || WORKER_URL).replace(/\/$/, "");
 }
 // The worker sends every subitem whose Timeline ends on or after ?from=. Today onwards is asked for exactly as before;
 // a second request starting 30 days back adds the subitems that had already ended. If that one fails, ignores the date

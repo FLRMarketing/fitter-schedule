@@ -108,3 +108,7 @@ python3 -m http.server 8123
 ```
 
 `test/schedule` is a symlink to `fixture.json`, so the page loads the snapshot instead of the worker. Any passcode works locally.
+
+`?worker=` only works like this, with the page opened on this computer (localhost or 127.0.0.1) and a local worker
+address. On the published site the page ignores it and always uses `WORKER_URL`, and it forgets any address an older
+version saved, so a link can't send the team passcode anywhere else.
