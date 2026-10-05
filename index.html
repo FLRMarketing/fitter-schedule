@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>FLR Fitter Schedule</title>
-<meta name="description" content="Who's free, who's working and which jobs still need a fitter — the next two weeks of the FLR Work Programme.">
+<meta name="description" content="Who's free, who's working and which jobs still need a fitter — 30 days either side of today on the FLR Work Programme.">
 <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -393,12 +393,16 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
 .st{padding:0 6px;border-radius:5px;background:var(--fill);color:var(--ink);font-weight:600}
 .job .st{background:var(--surface);box-shadow:inset 0 0 0 var(--hair) var(--sep)}
 .st.tbc,.job .st.tbc{background:var(--gold-soft);color:var(--gold-ink);box-shadow:none}
-/* Arrivals (FLR administrators): when the fitter's van reached the site, from FleetView. Tapping one shows the job's log. */
-.arr{display:inline-flex;align-items:center;gap:5px;padding:0 7px;border-radius:999px;font-weight:600;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.arr.on{background:var(--green-soft);color:var(--green-ink)}
-.arr.on::before{content:"";width:6px;height:6px;flex:none;border-radius:50%;background:currentColor}
-.arr.done{background:var(--surface);box-shadow:inset 0 0 0 var(--hair) var(--sep);color:var(--ink-2)}
-.arr.nc{background:transparent;box-shadow:inset 0 0 0 1px var(--line-2);color:var(--ink-3);font-weight:500}
+/* Arrivals (Admins and Super Admins): what FleetView saw of the fitter's van at the site. Every label is about the van,
+   not the person (it shows the van, not who was in it). Green only for a van that arrived; gold for one not seen at the
+   site; an outline for one that couldn't be checked, with why. Tapping one shows the job's log. */
+.arr{display:inline-flex;align-items:center;gap:4px;padding:0 7px 0 5px;border-radius:999px;font-weight:600;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.arr .ico{width:14px;height:14px}
+.arr.ok{background:var(--green-soft);color:var(--green-ink)}
+.arr.left{background:var(--surface);box-shadow:inset 0 0 0 var(--hair) var(--sep);color:var(--ink-2)}
+.arr.closed{background:var(--surface);box-shadow:inset 0 0 0 var(--hair) var(--sep);color:var(--ink-3)}
+.arr.no{background:transparent;box-shadow:inset 0 0 0 1.5px var(--gold);color:var(--gold-ink)}
+.arr.cant{background:transparent;box-shadow:inset 0 0 0 1px var(--line-2);color:var(--ink-3);font-weight:500;white-space:normal}
 .arr:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 @media (hover:hover){.arr:hover{filter:brightness(.96)}}
 .with{font-size:12.5px;color:var(--ink-3)}
@@ -414,7 +418,7 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
   .group.pad .jobs{grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:8px}
 }
 
-/* ---------------------------------------------------------------- fitter view: one person's next two weeks */
+/* ---------------------------------------------------------------- fitter view: one person's days, 30 either side of today */
 .drow{position:relative;display:grid;grid-template-columns:52px minmax(0,1fr);grid-template-areas:"tile state" "tile jobs";column-gap:14px;row-gap:8px;padding:12px 16px 14px}
 .drow .dtile{grid-area:tile}
 .drow .dstate{grid-area:state}
@@ -432,22 +436,39 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
 .dstate{display:flex;flex-wrap:wrap;align-items:center;align-content:flex-start;gap:6px;min-width:0;min-height:28px}
 @media (min-width:900px){.drow{grid-template-columns:52px minmax(170px,214px) minmax(0,1fr);grid-template-areas:"tile state jobs";column-gap:18px}.dstate{padding-top:2px}}
 
-/* ---------------------------------------------------------------- jobs view: each job once, by start date; a tap opens it */
+/* ---------------------------------------------------------------- jobs view: each job once; today's crew first; a tap opens it */
 .dgroup{margin:0 0 24px}
-.dg-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0 4px 10px}
+/* Each date's header stays pinned under the bar while its jobs scroll by, on the bar's material once pinned (syncStrip) */
+.dg-head{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--nav-h));z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:0 0 4px;padding:7px 4px 9px}
+.dg-head::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);background:var(--mat);
+  box-shadow:inset 0 calc(-1 * var(--hair)) 0 var(--mat-edge);opacity:0;transition:opacity .2s}
+.dg-head.stuck::before{opacity:1;-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
 .dg-head h2{font:600 17px/1.3 var(--font-display);letter-spacing:-.016em}
+/* Today's jobs in two lists: those with someone (or a gap to fill) booked today, then those running with nobody on today */
+.dg-sub{margin:4px 4px 8px;font:600 13.5px/1.3 var(--font-text);letter-spacing:-.003em;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.dgroup .group+.dg-sub{margin-top:20px}
 .jcard{position:relative}
 .jcard+.jcard::before{content:"";position:absolute;z-index:1;top:0;left:16px;right:0;height:var(--hair);background:var(--sep)}
-.jrow{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 16px;gap:9px 12px;width:100%;margin:0;padding:13px 16px 14px;border:0;background:none;
-  color:inherit;font:inherit;text-align:left;-webkit-tap-highlight-color:transparent;transition:background-color .15s}
+.jrow{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 28px 16px;grid-template-areas:"main mon chev" "fit fit chev";gap:9px 12px;width:100%;margin:0;
+  padding:13px 16px 14px;border:0;background:none;color:inherit;font:inherit;text-align:left;-webkit-tap-highlight-color:transparent;transition:background-color .15s}
 .jrow:focus-visible{outline-offset:-2px}
 @media (hover:hover){.jrow:hover{background:var(--row-hover)}}
 .jrow:active{background:var(--fill-2);transition-duration:0s}
-.jr-main{display:flex;flex-direction:column;gap:2px;min-width:0}
-.jr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.jr-main{grid-area:main;display:flex;flex-direction:column;gap:2px;min-width:0}
+.jr-top{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
 .jr-top .t{font:600 15px/1.32 var(--font-text);letter-spacing:-.012em;overflow-wrap:anywhere}
-.jr-fit{display:flex;flex-wrap:wrap;align-content:flex-start;gap:6px;min-width:0}
-/* a person on the job: photo, name, their dates if not the job's, TBC, today's arrival; on a narrow screen it wraps under the name */
+.jr-fit{grid-area:fit;display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
+.jr-chips{display:flex;flex-wrap:wrap;gap:6px;min-width:0;max-width:100%}
+.jr-tally{font-size:12.5px;line-height:1.35;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.jr-sp{grid-area:mon}
+/* monday.com from a closed row: a link of its own beside the chevron (a link can't sit inside the row's button) */
+.jr-mon{position:absolute;z-index:2;top:7px;right:42px;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;color:var(--ink-3);
+  -webkit-tap-highlight-color:transparent;transition:background-color .15s,color .15s,transform .28s var(--ease)}
+.jr-mon .ico{width:15px;height:15px}
+@media (hover:hover){.jr-mon:hover{background:var(--fill);color:var(--tint)}}
+.jr-mon:active{background:var(--fill-2);transform:scale(.92);transition-duration:.08s}
+.jr-mon:focus-visible{outline-offset:0}
+/* a person on the job: photo, name, their dates if not the job's, TBC; on a narrow screen it wraps under the name */
 .jf{display:inline-flex;align-items:flex-start;gap:6px;max-width:100%;padding:2px 9px;border-radius:13px;background:var(--fill);font:500 12.5px/1.45 var(--font-text)}
 .jf.has-face{padding-left:2px}
 .jf .mini{display:block;width:18px;height:18px;flex:none;border-radius:50%;object-fit:cover;background:var(--ph-bg)}
@@ -457,43 +478,76 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
 .jf .d{color:var(--ink-2);font-variant-numeric:tabular-nums}
 .jf .tbc{padding:0 5px;border-radius:5px;background:var(--gold-soft);color:var(--gold-ink);font-weight:600;font-size:11.5px}
 .jf.none{background:var(--red-soft);color:var(--red-ink);font-weight:600;white-space:nowrap}
-.t-arr{font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink-2)}
-.t-arr .ico{display:inline-block;width:13px;height:13px;margin-right:2px;vertical-align:-2px}
-.t-arr.on{color:var(--green-ink)}
-.t-arr.nc{color:var(--ink-3);font-weight:500}
-.jr-chev{grid-column:2;grid-row:1 / span 2;align-self:center;width:16px;height:16px;color:var(--ink-3);transition:transform .32s var(--ease)}
-.jcard.open .jr-chev{transform:rotate(90deg)}
-/* the opened part: its height eases open (0fr to 1fr); shut, it's hidden from taps, the tab key and screen readers */
+/* today's crew, each with what their van did today (Admins and Super Admins): the chip takes the van's state */
+.jf.van{padding-left:6px;font-variant-numeric:tabular-nums}
+.jf.van .vi{display:block;width:15px;height:15px;flex:none;margin-top:1.5px}
+.jf.van .tx>*{white-space:normal}
+.jf.ok{background:var(--green-soft);color:var(--green-ink)}
+.jf.left{background:var(--fill);color:var(--ink)}
+.jf.closed{background:var(--fill);color:var(--ink-2)}
+.jf.no{background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--gold);color:var(--gold-ink)}
+.jf.cant{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line-2);color:var(--ink-2)}
+.pill.quiet{background:var(--fill);color:var(--ink-2)}
+.pill.quiet::before{display:none}
+.jr-chev{grid-area:chev;align-self:center;width:16px;height:16px;color:var(--ink-3);transition:transform .32s var(--ease)}
+.jcard.open>.jrow>.jr-chev{transform:rotate(90deg)}
+/* the opened part: its height eases open (0fr to 1fr); shut, it's hidden from taps, the tab key and screen readers.
+   Only a fold's own child opens with it (>), so Later and Earlier inside an opened job stay folded until tapped. */
 .jr-more{display:grid;grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows .32s var(--ease),visibility 0s linear .32s}
-.jcard.open .jr-more,.early.open>.jr-more{grid-template-rows:1fr;visibility:visible;transition:grid-template-rows .32s var(--ease),visibility 0s}
+.jcard.open>.jr-more,.early.open>.jr-more,.jfold.open>.jr-more{grid-template-rows:1fr;visibility:visible;transition:grid-template-rows .32s var(--ease),visibility 0s}
 .jr-in{min-height:0;overflow:hidden}
+@supports (overflow:clip){.jr-in{overflow:clip}}   /* clips the same, but lets the Earlier fold's date headers pin */
 .jd{display:flex;flex-direction:column;gap:10px;padding:0 16px 16px}
 .jd-addr{font-size:13px;line-height:1.4;color:var(--ink-2);overflow-wrap:anywhere}
 .jd-list{border-radius:12px;background:var(--surface-2);box-shadow:inset 0 0 0 var(--hair) var(--sep)}
-.jp{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr);column-gap:12px;row-gap:5px;align-items:start;padding:10px 12px 11px}
-.jp+.jp::before{content:"";position:absolute;top:0;left:54px;right:0;height:var(--hair);background:var(--sep)}
-.jp .avatar{grid-row:1 / span 2;width:30px;height:30px;font-size:11.5px}
+.jsec{display:flex;flex-direction:column;gap:8px}
+.jsec-h{margin:4px 2px 0;font:600 13.5px/1.3 var(--font-text);letter-spacing:-.003em;color:var(--ink-2);font-variant-numeric:tabular-nums}
+/* today's people: photo, name, what their van did (or "Booked today"), anything their booking adds, the plate */
+.jp{position:relative;display:grid;grid-template-columns:30px minmax(0,1fr) auto;column-gap:12px;align-items:center;padding:10px 12px 11px}
+.jp+.jp::before,.jp+.jb::before{content:"";position:absolute;top:0;left:54px;right:0;height:var(--hair);background:var(--sep)}
+.jp .avatar{width:30px;height:30px;font-size:11.5px}
 .avatar.need{background:var(--red-soft);color:var(--red-ink);font-size:15px}
-.jp-who{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;min-width:0;min-height:30px}
+.jp-body{display:flex;flex-direction:column;gap:1px;min-width:0}
+.jp-who{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;min-width:0}
 .jp-who b{font:600 14.5px/1.3 var(--font-text);letter-spacing:-.01em;overflow-wrap:anywhere}
 .jp.need .jp-who b{color:var(--red-ink)}
-.jp-who .veh .ico{width:17px;height:17px}
-.jp-who .plate{font-size:11.5px}
-.jp-bks{display:grid;gap:5px;min-width:0}
-.bk{display:flex;flex-wrap:wrap;align-items:center;gap:3px 8px;min-width:0;font-size:13px;line-height:1.45;color:var(--ink-2);font-variant-numeric:tabular-nums}
-.bk-d{font-weight:600;color:var(--ink)}
-.bk .n{color:var(--ink-3);overflow-wrap:anywhere}
-.st.ok{background:var(--green-soft);color:var(--green-ink)}
+.jp-st{font-size:13px;line-height:1.4;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.jp-st.ok{color:var(--green-ink)}
+.jp-st.no{color:var(--gold-ink)}
+.jp-st.cant,.jp-st.closed{color:var(--ink-3)}
+.jp-x{display:flex;flex-wrap:wrap;align-items:center;gap:3px 8px;font-size:12.5px;line-height:1.4;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.jp-end{justify-self:end}
+.jp-end .plate{font-size:11.5px}
+.jp-end .veh .ico,.jp-end .van .ico{width:17px;height:17px}
+/* Later and Earlier inside an opened job: a booking per row (dates · person), folded until tapped */
+.jfold-head{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:32px;margin:0;padding:4px 2px 0;border:0;background:none;
+  color:var(--ink-2);font:600 13.5px/1.3 var(--font-text);letter-spacing:-.003em;text-align:left;font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent}
+.jfold-head:active{opacity:.6}
+.jfold-head .jr-chev{width:15px;height:15px}
+.jfold.open>.jfold-head>.jr-chev{transform:rotate(90deg)}
+.jfold>.jr-more>.jr-in>.jd-list{margin-top:6px}
+.jb{position:relative;display:flex;flex-direction:column;gap:2px;padding:10px 12px 11px}
+.jb+.jb::before{content:"";position:absolute;top:0;left:12px;right:0;height:var(--hair);background:var(--sep)}
+.jb-t{font:500 14px/1.35 var(--font-text);letter-spacing:-.008em;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.jb.gap .jb-t{color:var(--red-ink);font-weight:600}
+.jb.gap.past .jb-t{color:var(--ink-2);font-weight:500}
+.jb-x{display:flex;flex-wrap:wrap;align-items:center;gap:3px 8px;font-size:12.5px;line-height:1.4;color:var(--ink-3)}
+.jb-v{font-size:13px;line-height:1.4;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.jd-note{margin:2px 2px 0;font-size:12.5px;line-height:1.45;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.jb-x .n,.jp-x .n{color:var(--ink-3);overflow-wrap:anywhere}
+/* a booking's subitem Status: Scheduled is confirmed (navy, not green: green is only for a van that arrived), TBC still to be */
+.st.ok{background:var(--tint-soft);color:var(--tint)}
+.st.issue{background:var(--gold-soft);color:var(--gold-ink)}
 .jd-acts{display:flex;flex-wrap:wrap;gap:8px}
 .btn.sm{min-height:32px;padding:0 13px;font-size:13.5px}
 .btn.sm .ico{width:15px;height:15px}
 @media (min-width:900px){
-  .jrow{grid-template-columns:minmax(0,1fr) minmax(220px,34%) 16px;column-gap:20px;align-items:start}
-  .jr-chev{grid-column:3;grid-row:1;align-self:start;margin-top:2px}
-  .jd{padding:0 20px 18px 16px}
-  .jp{grid-template-columns:30px minmax(190px,260px) minmax(0,1fr);align-items:center}
-  .jp .avatar{grid-row:auto}
-  .jp-who{min-height:0}
+  .jrow{grid-template-columns:minmax(0,1fr) minmax(240px,46%) 28px 16px;grid-template-areas:"main fit mon chev";column-gap:16px;align-items:start}
+  .jr-mon{right:46px}
+  .jr-fit{align-items:flex-end;text-align:right}
+  .jr-chips{justify-content:flex-end}
+  .jr-chev{align-self:start;margin-top:2px}
+  .jd{max-width:780px;padding:0 20px 18px 16px}
 }
 /* Earlier: the 30 days before today, folded away until wanted (Fitter and Jobs) */
 .early{margin:0 0 20px}
@@ -506,14 +560,13 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
 .early-head b{font:600 15px/1.3 var(--font-text);letter-spacing:-.012em}
 .early-head small{font-size:13px;line-height:1.35;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .early-head .jr-chev{flex:none}
-.early.open .early-head .jr-chev{transform:rotate(90deg)}
-.early .jr-in>:first-child{margin-top:14px}
+.early.open>.early-head>.jr-chev{transform:rotate(90deg)}
+.early>.jr-more>.jr-in>:first-child{margin-top:14px}
 .early .dgroup:last-child{margin-bottom:4px}
 .early-note{margin:0 4px 10px;font-size:13px;line-height:1.4;color:var(--ink-3)}
 .jf.none.past{background:var(--fill);color:var(--ink-2)}
-.jp.need.past .jp-who b{color:var(--ink-2)}
 .avatar.need.past{background:var(--fill);color:var(--ink-3)}
-@media (prefers-reduced-motion:reduce){.jr-chev,.jr-more,.jcard.open .jr-more,.early.open>.jr-more{transition:none}}
+@media (prefers-reduced-motion:reduce){.jr-chev,.jr-more{transition:none}}
 
 /* ---------------------------------------------------------------- footer */
 .foot{margin:34px 0 0;padding-top:14px;border-top:var(--hair) solid var(--sep);font-size:12.5px;line-height:1.6;color:var(--ink-3);text-align:center;font-variant-numeric:tabular-nums}
@@ -561,13 +614,15 @@ button.arow:active{background:var(--fill)}
 .arow.static{cursor:default}
 .arow+.arow::before{content:"";position:absolute;top:0;left:37px;right:0;height:var(--hair);background:var(--sep)}
 .arow .dot{grid-row:1 / span 3;align-self:start;width:9px;height:9px;margin-top:5px;border-radius:50%;background:var(--ink-3)}
-.arow .dot.on{background:var(--green-ink)}
-.arow .dot.nc{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ink-3)}
+.arow .dot.ok{background:var(--green-ink)}
+.arow .dot.no{background:transparent;box-shadow:inset 0 0 0 1.5px var(--gold)}
+.arow .dot.cant,.arow .dot.booked{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ink-3)}
 .arow b{font:600 15px/1.35 var(--font-text);letter-spacing:-.01em;overflow-wrap:anywhere}
 .arow .j,.arow .x{font-size:13px;line-height:1.4;color:var(--ink-2);overflow-wrap:anywhere}
 .arow .s{font-size:13.5px;line-height:1.4;font-weight:600;color:var(--ink-2);font-variant-numeric:tabular-nums}
-.arow .s.on{color:var(--green-ink)}
-.arow .s.nc{font-weight:500;color:var(--ink-3)}
+.arow .s.ok{color:var(--green-ink)}
+.arow .s.no{color:var(--gold-ink)}
+.arow .s.cant,.arow .s.closed,.arow .s.booked{font-weight:500;color:var(--ink-3)}
 .arr-meta{font-size:13px;line-height:1.4;color:var(--ink-3);font-variant-numeric:tabular-nums}
 .arr-job{display:flex;flex-direction:column;gap:3px}
 .arr-job h3{font:600 17px/1.3 var(--font-text);letter-spacing:-.014em;overflow-wrap:anywhere}
@@ -640,6 +695,7 @@ button.arow:active{background:var(--fill)}
   <symbol id="i-arrivals" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.2-5.3-6.2-10.6a6.2 6.2 0 0 1 12.4 0C18.2 15.7 12 21 12 21Z"/><path d="M12 7.6v3l2 1.3"/></symbol>
   <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 6-6 6 6 6"/></symbol>
   <symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.5 6 6 6-6 6"/></symbol>
+  <symbol id="i-q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.7"/><path stroke-width="2.8" d="M12 17.3h.01"/></symbol>
 </svg>
 
 <div class="app" id="app">
@@ -1359,16 +1415,18 @@ function renderFitter() {
 }
 
 /* ---------- Jobs view ---------- */
+// Which jobs: the whole window, those in progress today, or those still needing a fitter. Someone who has never picked
+// starts on Today (today's crew first); a choice made before is kept.
+const JOB_FILTERS = [["all", "All jobs"], ["today", "Today"], ["unassigned", "Needs fitter"]];
+if (!store.get("jobsFilter", "") || !JOB_FILTERS.some(([k]) => k === jobsFilter)) jobsFilter = "today";
 function renderJobs() {
   const el = document.getElementById("viewJobs");
   if (!data) return;
   if (!el.querySelector("#jobsBody")) {
     el.innerHTML = `<div class="toolbar">
-        <fieldset class="seg" id="jobsFilter"><legend>Show</legend>
-          <label><input type="radio" name="jobsFilter" value="all" ${jobsFilter === "all" ? "checked" : ""}><span>All jobs</span><b data-count="all"></b></label>
-          <label><input type="radio" name="jobsFilter" value="unassigned" ${jobsFilter === "unassigned" ? "checked" : ""}><i class="sw alert" aria-hidden="true"></i><span>Needs fitter</span><b data-count="unassigned"></b></label>
-        </fieldset>
-        <input class="input search" id="searchJobs" type="search" placeholder="Search job, postcode or fitter" value="${esc(search)}" aria-label="Search" autocomplete="off">
+        <fieldset class="seg" id="jobsFilter"><legend>Show</legend>${JOB_FILTERS.map(([k, label]) =>
+          `<label><input type="radio" name="jobsFilter" value="${k}" ${jobsFilter === k ? "checked" : ""}>${k === "unassigned" ? `<i class="sw alert" aria-hidden="true"></i>` : ""}<span>${label}</span><b data-count="${k}"></b></label>`).join("")}</fieldset>
+        <input class="input search" id="searchJobs" type="search" placeholder="${matchMedia("(max-width: 480px)").matches ? "Job, address, postcode, fitter or plate" : "Search job, address, postcode, fitter or plate"}" value="${esc(search)}" aria-label="Search jobs by job, address, postcode, fitter or plate" autocomplete="off">
       </div>
       <div id="jobsBody"></div>`;
     FLRUI.initSeg(el.querySelector("#jobsFilter"));
@@ -1377,8 +1435,10 @@ function renderJobs() {
 }
 // One card per job. A job is a Work Programme item; its subitems in the window (one per fitter or crew, "(copy)" ones
 // included) come together only under the item they belong to (e.job.id), never because their names look alike, so
-// two jobs with similar names stay apart. A tap opens the card: each person's dates, status and arrival.
+// two jobs with similar names stay apart. A tap opens the card: today's people and what their vans did, then the
+// bookings still to come (Later) and those over (Earlier).
 const openJobs = new Set();   // cards left open, kept through re-renders
+const openFolds = new Map();  // "<job>:later" / "<job>:earlier" -> open, once someone has tapped it
 const jobKey = e => e.job.id ? `j${e.job.id}` : `e${e.id}`;
 // Date spans, with overlapping or back-to-back bookings run together: [{ from, to }], earliest first.
 function spansOf(list) {
@@ -1400,9 +1460,14 @@ function spansLabel(spans) {
     return n && n.from.slice(0, 7) === s.to.slice(0, 7) ? d : `${d} ${b.mon}`;
   }).join(", ");
 }
+// Each job's bookings, worked out against today: a booking is one person on one subitem, or one subitem nobody is on
+// yet. today: those that include today; earlier: those over (newest first); later: those still to start (soonest
+// first); crew: each person booked today, once; next: the next booking's first day; need: the first day from today
+// with a subitem still waiting for a fitter, and how many are waiting that day.
 function jobsOf(entries) {
   const m = new Map();
   for (const e of entries) { const k = jobKey(e); if (!m.has(k)) m.set(k, { key: k, job: e.job, entries: [] }); m.get(k).entries.push(e); }
+  const who = b => b.f ? b.f.name : "";
   return [...m.values()].map(j => {
     j.entries.sort((a, b) => a.from.localeCompare(b.from) || a.to.localeCompare(b.to));
     j.spans = spansOf(j.entries);
@@ -1413,7 +1478,25 @@ function jobsOf(entries) {
       .sort((a, b) => a.entries[0].from.localeCompare(b.entries[0].from) || a.f.name.localeCompare(b.f.name));
     j.needs = j.entries.filter(e => !e.fitters.length);
     j.waiting = j.needs.filter(e => e.to >= TODAY);   // still to come: a fitter is wanted; one that's over is only a record
-    j.text = [j.job.name, j.job.postcode, j.job.wfm, ...j.entries.map(e => e.name), ...j.people.map(p => p.label)].join(" ").toLowerCase();
+    j.bookings = j.entries.flatMap(e => e.fitters.length ? e.fitters.map(label => ({ e, label, f: parseLabel(label) })) : [{ e, label: "", f: null }]);
+    j.today = j.bookings.filter(b => overlaps(b.e, TODAY));
+    j.earlier = j.bookings.filter(b => b.e.to < TODAY).sort((a, b) => b.e.to.localeCompare(a.e.to) || b.e.from.localeCompare(a.e.from) || who(a).localeCompare(who(b)));
+    j.later = j.bookings.filter(b => b.e.from > TODAY).sort((a, b) => a.e.from.localeCompare(b.e.from) || a.e.to.localeCompare(b.e.to) || who(a).localeCompare(who(b)));
+    const crew = new Map();
+    for (const b of j.today) if (b.label) { if (!crew.has(b.label)) crew.set(b.label, { label: b.label, f: b.f, entries: [] }); crew.get(b.label).entries.push(b.e); }
+    // in the order of the drawings: vans arrived, left, not seen, can't check, then the rest; by name within each
+    const rank = p => { const st = arrMini(p); return st ? ({ ok: 0, left: 1, closed: 2, no: 3, cant: 4 })[st.kind] ?? 5 : 5; };
+    j.crew = [...crew.values()].sort((a, b) => rank(a) - rank(b) || a.f.name.localeCompare(b.f.name));
+    j.gaps = j.today.filter(b => !b.label);
+    j.running = j.from <= TODAY && j.to >= TODAY;
+    j.next = j.later.length ? j.later[0].e.from : "";
+    const nd = j.waiting.map(e => e.from > TODAY ? e.from : TODAY).sort()[0];
+    j.need = nd ? { day: nd, n: j.waiting.filter(e => overlaps(e, nd)).length } : null;
+    // Search: the job, its address and group, its subitems' names and statuses (TBC), each person's label and plates.
+    const plates = j.people.flatMap(p => { const x = faceOf(p.f); return [...(x ? x.regs : []), p.f.van]; }).filter(Boolean);
+    j.text = [j.job.name, j.job.postcode, String(j.job.postcode || "").replace(/\s+/g, ""), j.job.wfm, j.job.address, j.job.group,
+      ...j.entries.map(e => e.name), ...j.entries.map(e => e.status === "Default" ? "" : e.status), ...j.people.map(p => p.label),
+      ...plates, ...plates.map(r => r.replace(/\s+/g, ""))].join(" ").toLowerCase();
     return j;
   });
 }
@@ -1437,53 +1520,118 @@ function bookedChip(st) {
   if (!st || st === "Default") return "";
   return st === "Scheduled" ? `<span class="st ok">Scheduled</span>` : st === "TBC" ? `<span class="st tbc" title="To be confirmed">TBC</span>` : statusChip(st);
 }
-function jobCard(j) {
-  const open = openJobs.has(j.key), nNeed = j.waiting.length, when = spansLabel(j.spans);
+// "Needs fitter today", "Needs 2 fitters Tue 6 Oct": the first day a fitter is wanted, and how many that day.
+function needLabel(need) {
+  const when = need.day === TODAY ? "today" : need.day === addDays(TODAY, 1) ? "tomorrow" : longDate(need.day);
+  return `${need.n === 1 ? "Needs fitter" : `Needs ${need.n} fitters`} ${when}`;
+}
+// The board's group, with "Scheduling Issue" picked out.
+function groupChip(g) { return g === "Scheduling Issue" ? `<span class="st issue">${esc(g)}</span>` : g ? `<span>${esc(g)}</span>` : ""; }
+// A person on a job that isn't running today: photo, name, their dates when not the job's, TBC.
+function personChip(p, when, tbcAll) {
+  const x = faceOf(p.f), mine = spansLabel(spansOf(p.entries));
+  const tbc = !tbcAll && p.entries.some(e => e.status === "TBC");
+  return `<span class="jf${x && x.photo ? " has-face" : ""}">${x && x.photo ? `<img class="mini" src="${x.photo}" alt="" loading="lazy" decoding="async">` : ""}<span class="tx"><span>${esc(p.f.name)}</span>${mine !== when ? ` <span class="d">${esc(mine)}</span>` : ""}${tbc ? ` <span class="tbc">TBC</span>` : ""}</span></span>`;
+}
+// Someone booked today: with arrivals, the chip takes on what their van did today ("<name> · Van arrived 07:42");
+// otherwise (or before there's anything to say) their photo and name.
+function crewChip(p, tbcAll) {
+  const st = arrMini(p), x = faceOf(p.f);
+  const tbc = !tbcAll && p.entries.some(e => e.status === "TBC") ? ` <span class="tbc">TBC</span>` : "";
+  if (st && st.chip) return `<span class="jf van ${st.kind}" title="${esc(st.title)}">${icon(st.kind === "cant" ? "q" : "van", "vi")}<span class="tx"><span>${esc(p.f.name)} · ${esc(st.chip)}</span>${tbc}</span></span>`;
+  return `<span class="jf${x && x.photo ? " has-face" : ""}">${x && x.photo ? `<img class="mini" src="${x.photo}" alt="" loading="lazy" decoding="async">` : ""}<span class="tx"><span>${esc(p.f.name)}</span>${tbc}</span></span>`;
+}
+// where: "today" (in progress: filed under today), "ahead" (under its first day) or "over" (under Earlier).
+function jobCard(j, where) {
+  const open = openJobs.has(j.key), when = spansLabel(j.spans), name = j.job.name || j.entries[0].name;
   // TBC once for the job when every status set on it is TBC; otherwise on the chip of each person with a TBC booking
   const statuses = [...new Set(j.entries.map(e => e.status))], set = statuses.filter(s => s && s !== "Default");
   const tbcAll = set.length === 1 && set[0] === "TBC";
-  const ids = j.entries.map(e => e.id).join(",");
-  const today = arrivals ? arrivals.today : TODAY;
-  const chips = j.people.map(p => {
-    const x = faceOf(p.f), mine = spansLabel(spansOf(p.entries));
-    const tbc = !tbcAll && p.entries.some(e => e.status === "TBC");
-    const arr = p.entries.map(e => arrMini(e.id, p.label)).find(Boolean) || "";
-    return `<span class="jf${x && x.photo ? " has-face" : ""}">${x && x.photo ? `<img class="mini" src="${x.photo}" alt="" loading="lazy" decoding="async">` : ""}<span class="tx"><span>${esc(p.f.name)}</span>${mine !== when ? ` <span class="d">${esc(mine)}</span>` : ""}${tbc ? ` <span class="tbc">TBC</span>` : ""}${arr ? " " + arr : ""}</span></span>`;
-  }).join("") || `<span class="jf none${nNeed ? "" : " past"}">No fitter assigned</span>`;
-
-  const bk = (e, who) => {
-    const n = subName(e), a = who && overlaps(e, today) ? arrChip(today, e.id, who, ids) : "";
-    return `<div class="bk"><span class="bk-d">${esc(rangeLabel(e.from, e.to))}</span>${bookedChip(e.status)}${n ? `<span class="n">${esc(n)}</span>` : ""}${a}</div>`;
-  };
-  const rows = j.people.map(p => `<div class="jp">${avatar(p.f)}<div class="jp-who"><b>${esc(p.f.name)}</b>${vanTag(p.f)}${kindChip(p.f)}</div>
-      <div class="jp-bks">${p.entries.map(e => bk(e, p.label)).join("")}</div></div>`).join("")
-    + j.needs.map(e => `<div class="jp need${e.to < TODAY ? " past" : ""}"><span class="avatar need${e.to < TODAY ? " past" : ""}" aria-hidden="true">?</span><div class="jp-who"><b>No fitter assigned</b></div>
-      <div class="jp-bks">${bk(e, "")}</div></div>`).join("");
-  const log = arrivals && arrivals.visits.some(v => ids.split(",").includes(v.entry))
-    ? `<button type="button" class="btn sm" data-arr="${ids}">${icon("arrivals")}Arrivals</button>` : "";
-  const addr = (j.job.address || "").trim();
-
+  let fit;
+  if (where === "today") {   // today's crew only, then how many bookings are either side of today
+    const tally = [j.earlier.length ? `+${j.earlier.length} earlier` : "", j.later.length ? `+${j.later.length} later` : "no more booked"].filter(Boolean).join(" · ");
+    const chips = j.today.length
+      ? j.crew.map(p => crewChip(p, tbcAll)).join("") + (j.crew.length ? "" : `<span class="jf none">No fitter assigned</span>`)
+      : `<span class="pill quiet">No one booked today${j.next ? ` · next ${esc(longDate(j.next))}` : ""}</span>`;
+    fit = `<span class="jr-chips">${chips}</span><span class="jr-tally">${esc(tally)}</span>`;
+  } else {
+    fit = `<span class="jr-chips">${j.people.map(p => personChip(p, when, tbcAll)).join("") || `<span class="jf none${j.waiting.length ? "" : " past"}">No fitter assigned</span>`}</span>`;
+  }
   return h`<div class="jcard${open ? " open" : ""}" data-job="${j.key}">
     <button type="button" class="jrow" id="jb-${j.key}" aria-expanded="${open}" aria-controls="jd-${j.key}">
       <span class="jr-main">
-        <span class="jr-top"><span class="t">${esc(j.job.name || j.entries[0].name)}</span>${nNeed ? `<span class="pill alert">${nNeed === 1 ? "Needs fitter" : `Needs ${nNeed} fitters`}</span>` : ""}</span>
-        <span class="m"><span>${esc(when)}</span>${j.job.postcode ? `<span>${esc(j.job.postcode)}</span>` : ""}${j.job.wfm ? `<span>WFM ${esc(j.job.wfm)}</span>` : ""}<span>${esc(j.job.group)}</span>${statuses.filter(s => s !== "TBC" || tbcAll).map(statusChip).join("")}</span>
+        <span class="jr-top"><span class="t">${esc(name)}</span>${j.need ? `<span class="pill alert">${esc(needLabel(j.need))}</span>` : ""}</span>
+        <span class="m"><span>${esc(when)}</span>${j.job.postcode ? `<span>${esc(j.job.postcode)}</span>` : ""}${j.job.wfm ? `<span>WFM ${esc(j.job.wfm)}</span>` : ""}${groupChip(j.job.group)}${statuses.filter(s => s !== "TBC" || tbcAll).map(statusChip).join("")}</span>
       </span>
-      <span class="jr-fit">${chips}</span>
-      ${icon("chev", "jr-chev")}
+      <span class="jr-fit">${fit}</span>
+      <span class="jr-sp" aria-hidden="true"></span>${icon("chev", "jr-chev")}
     </button>
-    <div class="jr-more" id="jd-${j.key}"><div class="jr-in"><div class="jd">
-      ${addr && addr !== j.job.postcode ? `<p class="jd-addr">${esc(addr)}</p>` : ""}
-      <div class="jd-list">${rows}</div>
-      <div class="jd-acts">${j.job.id ? `<a class="btn sm" href="${jobLink(j.entries[0])}" target="_blank" rel="noopener">Open in monday.com${icon("ext")}</a>` : ""}${log}</div>
-    </div></div></div>
+    ${j.job.id ? `<a class="jr-mon" href="${jobLink(j.entries[0])}" target="_blank" rel="noopener" title="Open in monday.com" aria-label="Open ${esc(name)} in monday.com">${icon("ext")}</a>` : ""}
+    <div class="jr-more" id="jd-${j.key}"><div class="jr-in">${jobDetail(j, tbcAll)}</div></div>
   </div>`;
+}
+// The opened card: monday.com and the job's arrivals, then Today (people and their vans), Later and Earlier.
+function jobDetail(j, tbcAll) {
+  const ids = j.entries.map(e => e.id).join(","), addr = (j.job.address || "").trim();
+  const mon = j.job.id ? `<a class="btn sm" href="${jobLink(j.entries[0])}" target="_blank" rel="noopener">Open in monday.com${icon("ext")}</a>` : "";
+  const log = arrivals && arrivals.visits.some(v => ids.split(",").includes(v.entry)) ? `<button type="button" class="btn sm" data-arr="${ids}">${icon("arrivals")}Arrivals</button>` : "";
+  const parts = [];
+  if (j.running) parts.push(`<section class="jsec"><h3 class="jsec-h">Today · ${esc(longDate(TODAY))}</h3><div class="jd-list">${todayRows(j, tbcAll)}</div></section>`);
+  // Later: open by itself when nobody is on today (it holds what's next) or when it's all there is; Earlier when it's all.
+  if (j.running || j.later.length) parts.push(fold(j, "later", "Later", j.later, !j.running || !j.today.length));
+  if (j.earlier.length) parts.push(fold(j, "earlier", "Earlier", j.earlier, !j.running));
+  return `<div class="jd">
+      ${addr && addr !== j.job.postcode ? `<p class="jd-addr">${esc(addr)}</p>` : ""}
+      ${mon || log ? `<div class="jd-acts">${mon}${log}</div>` : ""}
+      ${parts.join("")}
+      <p class="jd-note">Bookings loaded: ${esc(rangeLabel(data.from && data.from > days[0] ? data.from : days[0], days[days.length - 1]))}.${arrivals ? " Van times show the van, not who was in it." : ""}</p>
+    </div>`;
+}
+function todayRows(j, tbcAll) {
+  if (!j.today.length) return `<div class="jb"><span class="jb-t">No one booked today${j.next ? ` · next ${esc(longDate(j.next))}` : ""}</span></div>`;
+  const when = spansLabel(j.spans);
+  return j.crew.map(p => {
+    const st = arrMini(p), x = faceOf(p.f);
+    const plate = x && x.regs.length ? `<span class="plate">${esc(x.regs[0])}</span>` : p.f.van ? vanChip(p.f.van) : "";
+    // What their booking adds: its dates when not the job's, TBC, what the subitem's name adds
+    const mine = spansLabel(spansOf(p.entries));
+    const extra = [mine !== when ? `<span>${esc(mine)}</span>` : "", !tbcAll && p.entries.some(e => e.status === "TBC") ? `<span class="st tbc" title="To be confirmed">TBC</span>` : "",
+      ...p.entries.map(e => subName(e)).filter(Boolean).map(n => `<span class="n">${esc(n)}</span>`)].join("");
+    return `<div class="jp">${avatar(p.f)}<div class="jp-body"><div class="jp-who"><b>${esc(p.f.name)}</b>${kindChip(p.f)}</div>
+        <div class="jp-st ${st ? st.kind : "booked"}"${st && st.title ? ` title="${esc(st.title)}"` : ""}>${esc(st ? st.line : "Booked today")}</div>${extra ? `<div class="jp-x">${extra}</div>` : ""}</div>${plate ? `<span class="jp-end">${plate}</span>` : ""}</div>`;
+  }).join("") + j.gaps.map(b => {
+    const n = subName(b.e);
+    return `<div class="jp need"><span class="avatar need" aria-hidden="true">?</span><div class="jp-body"><div class="jp-who"><b>No fitter assigned</b></div>
+        <div class="jp-x"><span>${esc(rangeLabel(b.e.from, b.e.to))}</span>${bookedChip(b.e.status)}${n ? `<span class="n">${esc(n)}</span>` : ""}</div></div></div>`;
+  }).join("");
+}
+// Later or Earlier: "Later · 2 bookings", folded; "Later · nothing booked" when there's none.
+function fold(j, which, title, list, dflt) {
+  if (!list.length) return `<p class="jsec-h">${title} · nothing booked</p>`;
+  const k = `${j.key}:${which}`, id = `${j.key}-${which}`, open = openFolds.has(k) ? openFolds.get(k) : dflt;
+  return `<div class="jfold${open ? " open" : ""}" data-fold="${k}">
+      <button type="button" class="jfold-head" id="jfh-${id}" aria-expanded="${open}" aria-controls="jfb-${id}"><span>${title} · ${list.length} ${list.length === 1 ? "booking" : "bookings"}</span>${icon("chev", "jr-chev")}</button>
+      <div class="jr-more" id="jfb-${id}"><div class="jr-in"><div class="jd-list">${list.map(bookingRow).join("")}</div></div></div>
+    </div>`;
+}
+// One booking: "6–8 Oct · Ryan Doyle" with its status, or, once it's over and there are arrivals, each of its days' van
+// result ("Van arrived 07:31 · left 16:02").
+function bookingRow(b) {
+  const e = b.e, over = e.to < TODAY, n = subName(e);
+  let vans = "";
+  if (over && b.label && arrivals) {
+    const vs = arrivals.visits.filter(v => v.entry === e.id && v.fitter === b.label && v.day < arrivals.today).sort((x, y) => y.day.localeCompare(x.day));
+    vans = vs.map(v => { const st = arrState(v); return st ? `<div class="jb-v"${st.title ? ` title="${esc(st.title)}"` : ""}>${e.from === e.to ? "" : `${esc(longDate(v.day))} · `}${esc(st.line)}</div>` : ""; }).join("");
+  }
+  const x = [bookedChip(e.status), n ? `<span class="n">${esc(n)}</span>` : ""].join("");
+  return `<div class="jb${b.label ? "" : over ? " gap past" : " gap"}"><div class="jb-t">${esc(rangeLabel(e.from, e.to))} · ${esc(b.label ? b.f.name : "No fitter assigned")}</div>${vans || (x ? `<div class="jb-x">${x}</div>` : "")}</div>`;
 }
 function toggleEarly(btn) {
   const fold = btn.closest(".early"), open = !fold.classList.contains("open");
   earlyOpen[fold.dataset.early] = open;
   fold.classList.toggle("open", open);
   btn.setAttribute("aria-expanded", String(open));
+  if (chrome) chrome.update();
 }
 function toggleJob(btn) {
   const card = btn.closest(".jcard"), open = !card.classList.contains("open");
@@ -1492,6 +1640,20 @@ function toggleJob(btn) {
   btn.setAttribute("aria-expanded", String(open));
   // Once it has opened, bring all of it into view (above the tab bar) if it ran off the bottom.
   if (open) setTimeout(() => { if (card.isConnected) card.scrollIntoView({ block: "nearest", behavior: FLRUI.reduced() ? "auto" : "smooth" }); }, FLRUI.reduced() ? 0 : 330);
+  if (chrome) chrome.update();
+}
+function toggleFold(btn) {
+  const f = btn.closest(".jfold"), open = !f.classList.contains("open");
+  openFolds.set(f.dataset.fold, open);
+  f.classList.toggle("open", open);
+  btn.setAttribute("aria-expanded", String(open));
+  if (chrome) chrome.update();
+}
+// "8 jobs need a fitter, 1 of them today"
+function needsLine(n, now) {
+  if (!n) return "every job has a fitter";
+  if (n === 1) return now ? "1 job needs a fitter today" : "1 job needs a fitter";
+  return `${n} jobs need a fitter${now ? `, ${now} of them today` : ""}`;
 }
 function renderJobsBody() {
   const el = document.getElementById("viewJobs"), body = el.querySelector("#jobsBody");
@@ -1500,34 +1662,43 @@ function renderJobsBody() {
   const q = search.trim().toLowerCase();
   const inWindow = jobsOf(data.entries.filter(e => classify(e) === "job" && e.from <= last && e.to >= days[0]));
   const found = q ? inWindow.filter(j => j.text.includes(q)) : inWindow;
-  const list = jobsFilter === "unassigned" ? found.filter(j => j.waiting.length) : found;
-  const nUn = inWindow.filter(j => j.waiting.length).length;
-  el.querySelector('[data-count="all"]').textContent = found.length;
-  el.querySelector('[data-count="unassigned"]').textContent = nUn;
-  setHead("Jobs", `${rangeLabel(days[0], last)} · ${nUn ? `${nUn} ${nUn === 1 ? "job needs" : "jobs need"} a fitter` : "every job has a fitter"}`);
+  // The counts follow the search; the line under the title is the whole window.
+  const pick = { all: found, today: found.filter(j => j.running), unassigned: found.filter(j => j.waiting.length) };
+  for (const [k] of JOB_FILTERS) el.querySelector(`[data-count="${k}"]`).textContent = pick[k].length;
+  const list = pick[jobsFilter] || found;
+  setHead("Jobs", `${rangeLabel(days[0], last)} · ${needsLine(inWindow.filter(j => j.waiting.length).length, inWindow.filter(j => j.need && j.need.day === TODAY).length)}`);
 
-  // Jobs already over go under "Earlier" (open while searching); the rest by start date, those already running under
-  // today; within a day by name.
+  // Jobs already over go under "Earlier" (open while searching), newest first; those running today under today, in two
+  // lists; the rest under the day they start. Within a day, jobs needing a fitter first (today first), then by name.
   const byName = (a, b) => (a.job.name || "").localeCompare(b.job.name || "", "en", { sensitivity: "base", numeric: true });
-  const groups = (jobs, first, today) => {
-    const byDate = new Map();
-    for (const j of jobs) { const k = j.from < first ? first : j.from; if (!byDate.has(k)) byDate.set(k, []); byDate.get(k).push(j); }
-    return [...byDate.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([iso, js]) =>
-      `<section class="dgroup"><header class="dg-head"><h2>${fullDate(iso)}</h2>${iso === today ? `<span class="tag today">Today &amp; in progress</span>` : ""}</header>
-      <div class="group">${js.sort(byName).map(jobCard).join("")}</div></section>`).join("");
-  };
-  const over = list.filter(j => j.to < TODAY), ahead = list.filter(j => j.to >= TODAY);
+  const needFirst = (a, b) => ((b.need && b.need.day === TODAY) - (a.need && a.need.day === TODAY)) || (!!b.need - !!a.need) || byName(a, b);
+  const cards = (js, where) => `<div class="group">${js.sort(needFirst).map(j => jobCard(j, where)).join("")}</div>`;
+  const byDay = (js, dayOf) => { const m = new Map(); for (const j of js) { const k = dayOf(j); if (!m.has(k)) m.set(k, []); m.get(k).push(j); } return [...m.entries()]; };
+  const head = (iso, tag = "") => `<header class="dg-head"><h2>${fullDate(iso)}</h2>${tag}</header>`;
+  const over = list.filter(j => j.to < TODAY), now = list.filter(j => j.running), ahead = list.filter(j => j.from > TODAY);
   let html = "";
-  if (jobsFilter !== "unassigned" && (over.length || !q)) {
+  if (jobsFilter === "all" && (over.length || !q)) {
+    const inner = byDay(over, j => j.to).sort((a, b) => b[0].localeCompare(a[0]))
+      .map(([iso, js]) => `<section class="dgroup">${head(iso)}${cards(js, "over")}</section>`).join("");
     html += earlyFold("jobs", "Earlier", over.length ? `${over.length} ${over.length === 1 ? "job" : "jobs"} finished ${rangeLabel(days[0], addDays(TODAY, -1))}` : "No jobs finished in the last 30 days",
-      earlyNote() + groups(over, days[0], ""), !!q && over.length > 0);
+      earlyNote() + (over.length ? `<p class="early-note">Newest first, under the day each job finished.</p>` : "") + inner, !!q && over.length > 0);
   }
-  html += groups(ahead, TODAY, TODAY);
-  if (!list.length) html += q ? emptyHtml("No jobs match", "Try another job, postcode or fitter.", "search")
+  if (now.length) {
+    const on = now.filter(j => j.today.length), idle = now.filter(j => !j.today.length), n = c => `${c} ${c === 1 ? "job" : "jobs"}`;
+    html += `<section class="dgroup today">${head(TODAY, `<span class="tag today">Today</span>`)}
+      ${on.length ? `<h3 class="dg-sub">On today · ${n(on.length)}</h3>${cards(on, "today")}` : ""}
+      ${idle.length ? `<h3 class="dg-sub">In progress, nobody booked today · ${n(idle.length)}</h3>${cards(idle, "today")}` : ""}
+    </section>`;
+  }
+  html += byDay(ahead, j => j.from).sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([iso, js]) => `<section class="dgroup">${head(iso)}${cards(js, "ahead")}</section>`).join("");
+  if (!list.length) html += q ? emptyHtml("No jobs match", "Try another job, address, postcode, fitter or plate.", "search")
     : jobsFilter === "unassigned" ? emptyHtml("Every job has a fitter", "Nothing from today on is waiting for one.", "check")
+    : jobsFilter === "today" ? emptyHtml("Nothing in progress today", "No job's dates include today.", "jobs")
     : emptyHtml("No jobs match", "", "search");
-  else if (!ahead.length) html += emptyHtml(q ? "Nothing from today on matches" : "No jobs from today on", "", q ? "search" : "jobs");
+  else if (jobsFilter === "all" && !now.length && !ahead.length) html += emptyHtml(q ? "Nothing from today on matches" : "No jobs from today on", "", q ? "search" : "jobs");
   body.innerHTML = html;
+  if (chrome) chrome.update();
 }
 
 /* ---------- views / chrome ---------- */
@@ -1600,14 +1771,22 @@ function timeAgo(iso) {
 function notice(html, cls) {
   document.getElementById("notice").innerHTML = html ? `<div class="note ${cls}" role="${cls === "err" ? "alert" : "status"}"><div class="at">${html}</div></div>` : "";
 }
-// Where the strip sticks under the bar, it takes on the bar's material and the two read as one.
+// Where the strip sticks under the bar, it takes on the bar's material and the two read as one. In the Jobs view the date
+// header pinned under the bar does the same (headers in a shut Earlier fold don't count).
 function syncStrip() {
   const bar = document.getElementById("stripBar"), nav = document.getElementById("navbar");
-  const on = !bar.hidden;
-  document.documentElement.style.setProperty("--strip-h", on ? bar.offsetHeight + "px" : "0px");
-  const stuck = on && window.scrollY > 0 && bar.getBoundingClientRect().top <= nav.getBoundingClientRect().bottom + .5;
+  const on = !bar.hidden, navB = nav.getBoundingClientRect().bottom;
+  const stuck = on && window.scrollY > 0 && bar.getBoundingClientRect().top <= navB + .5;
   bar.classList.toggle("stuck", stuck);
-  nav.classList.toggle("merged", stuck);
+  let pinned = null;
+  if (view === "jobs") for (const hd of document.querySelectorAll("#viewJobs .dg-head")) {
+    const s = window.scrollY > 0 && !hd.closest(".early:not(.open)") && hd.getBoundingClientRect().top <= navB + .5;
+    hd.classList.toggle("stuck", s);
+    if (s) pinned = hd;
+  }
+  // Jumps land below the strip, or below a pinned date header (html scroll-padding-top)
+  document.documentElement.style.setProperty("--strip-h", on ? bar.offsetHeight + "px" : pinned ? pinned.offsetHeight + "px" : "0px");
+  nav.classList.toggle("merged", stuck || !!pinned);
 }
 
 /* ---------- data: 30 days back to 30 days ahead, rolling on each day ---------- */
@@ -1722,7 +1901,7 @@ function openSheet(kind) {
           ${opt("showWeekends", "Show weekends", "Saturday and Sunday in the day strip and fitter view")}
           ${opt("includeRota", "Use the weekend rota", "Fitters on 'Not working – Weekend Rota' show as Off that weekend")}
           ${opt("showZ", "Show FLR staff and subcontractors", "ZFLR and ZSub entries get their own free/busy row")}
-          ${opt("includeCompleted", "Include jobs already marked Completed", "Jobs moved to Completed but dated in the next two weeks count as work")}
+          ${opt("includeCompleted", "Include jobs already marked Completed", "Completed jobs count as work on their days, 30 days either side of today. Switched off, they're hidden, and past days with only completed work show as free.")}
         </div>
       </div>
       <footer class="dlg-foot"><button class="btn primary lg block" type="button" id="sheetClose" data-act="sheet-close">Done</button></footer>`, "settings");
@@ -1781,43 +1960,92 @@ async function loadFaces() {
   loadArrivals();
 }
 
-/* ---------- arrivals: when each fitter's van reached the site (FleetView), for FLR administrators ---------- */
+/* ---------- arrivals: what FleetView saw of each fitter's van at the site, for Admins and Super Admins ---------- */
 // The flr-arrivals function checks FleetView every two minutes and keeps, per day, job and fitter, when their van stopped
-// at the site and when it left (public.fitter_arrivals, for administrators only: anyone else gets nothing and sees the
-// page as before). A visit still waiting shows nothing until 10:00; after that, like anything uncertain, "Arrival not
-// confirmed", with the reason on hover and in the job's log.
+// at the site and when it left (public.fitter_arrivals, for Admins and Super Admins: anyone else gets nothing and sees
+// the page as before). What's seen is the van, not who was in it, so every label says "Van …". Before 10:00 a booking
+// with no van stop yet is just "Booked today"; from 10:00 it's "Van not seen yet". "Can't check" is kept apart from
+// "not seen": it means the van couldn't be judged at all (no van on the label, someone else's van, no postcode,
+// FleetView not answering, the van already parked when the checks began), and says why.
 let hubClient = null;       // the Hub's database connection, once signed in
 let arrivals = null;        // { today, checkedAt, problem, visits, by: Map("day|entry|fitter" -> visit), sig }
 let arrTimer = 0, arrSearch = "", arrEntry = null, arrBack = false;
 const ukClock = (s, secs) => s ? new Date(s).toLocaleTimeString("en-GB", { timeZone: "Europe/London", hour: "2-digit", minute: "2-digit", ...(secs ? { second: "2-digit" } : {}), hourCycle: "h23" }) : "";
 function arrOf(day, entry, fitter) { return arrivals ? arrivals.by.get(`${day}|${entry}|${fitter}`) || null : null; }
+// Why a visit wasn't confirmed: the database's code (reasonCode, from the arrivals migration of 5 Oct 2026) or, from a
+// database without codes, worked out from its wording.
+const REASON_WORDS = [
+  [/^No FLR van on the Work Programme label/, "no_van"], [/^Van .* isn't in FleetView/, "van_not_in_fleetview"],
+  [/^FleetView has .* down as .*'s van/, "van_someone_elses"], [/^No site postcode/, "no_postcode"],
+  [/^The site postcode .* isn't a UK postcode/, "bad_postcode"], [/^Postcode .* couldn't be found/, "postcode_not_found"],
+  [/^The van stopped within reach of two/, "two_sites"], [/^The van was already parked here from before today/, "parked_before_today"],
+  [/^The van was already parked here/, "parked_before_checks"], [/^FleetView data isn't coming through/, "fleetview_down"],
+  [/^No arrival yet/, "not_seen_yet"], [/^No arrival was recorded/, "not_seen"], [/^No leaving time was recorded/, "no_leave_time"],
+];
+function reasonOf(v) {
+  if (v.reasonCode) return String(v.reasonCode);
+  const r = String(v.reason || "").replace(/[‘’]/g, "'");
+  const hit = REASON_WORDS.find(([re]) => re.test(r));
+  return hit ? hit[1] : r ? "other" : "";
+}
+// What couldn't be checked: [on a chip, in full]; null in full means the database's own words.
+const CANT_CHECK = {
+  no_van: ["no van on his label", "no FLR van on his Work Programme label"],
+  van_not_in_fleetview: ["van not in FleetView", null],
+  van_someone_elses: ["van down as someone else's", null],
+  no_postcode: ["no site postcode", "no site postcode on the Work Programme"],
+  bad_postcode: ["site postcode not valid", null],
+  postcode_not_found: ["site postcode not found", null],
+  two_sites: ["van near two of today's sites", "the van stopped within reach of two of today's sites"],
+  parked_before_checks: ["van already parked when checks began", "the van was already parked there when the checks began"],
+  parked_before_today: ["van parked there from before today", "the van was already parked there from before today"],
+  fleetview_down: ["FleetView not responding", "FleetView data isn't coming through"],
+};
+const lowerFirst = s => /^(FleetView|FLR)\b/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1);
+// One visit as the page shows it: { kind, chip, line, title }. kind: ok (the van arrived and is there: the only green),
+// left, closed (an earlier day the checks never saw it leave), no (not seen at the site: gold), cant (couldn't be
+// checked), booked (nothing to say yet). chip: the short form on cards; line: in an opened job and the log.
 function arrState(v) {
   if (!v) return null;
-  if (v.status === "on_site") return { cls: "on", text: `On site · Arrived ${ukClock(v.arrivedAt)}`, mini: ukClock(v.arrivedAt) };
-  if (v.status === "left") return { cls: "done", text: `Arrived ${ukClock(v.arrivedAt)}${v.leftAt ? ` · left ${ukClock(v.leftAt)}` : ""}`, mini: v.leftAt ? `${ukClock(v.arrivedAt)}–${ukClock(v.leftAt)}` : ukClock(v.arrivedAt) };
-  if (v.status === "not_confirmed") return { cls: "nc", text: "Arrival not confirmed", mini: "not confirmed" };
+  const past = !!arrivals && v.day < arrivals.today, at = ukClock(v.arrivedAt), title = arrDetail(v), code = reasonOf(v);
+  const s = (kind, chip, line = chip) => ({ kind, chip, line, title });
+  // An earlier day still "on site" (the checks stopped before the van left) never says it's still there.
+  if ((v.status === "on_site" && past) || (v.status === "left" && !v.leftAt)) return s("closed", `Van arrived ${at} · no leaving time recorded`);
+  if (v.status === "on_site") return s("ok", `Van arrived ${at}`);
+  if (v.status === "left") return past ? s("left", `Van arrived ${at} · left ${ukClock(v.leftAt)}`) : s("left", `Van left ${ukClock(v.leftAt)}`, `Van left ${ukClock(v.leftAt)} · arrived ${at}`);
+  if (v.status === "not_confirmed" && CANT_CHECK[code]) { const [chip, full] = CANT_CHECK[code]; return s("cant", `Can't check: ${chip}`, `Can't check: ${full || lowerFirst(v.reason || chip)}`); }
+  if (v.status === "not_confirmed" && code === "not_seen_yet" && !past) return s("no", "Van not seen yet", "Van not seen at the site yet");
+  if (v.status === "not_confirmed" && (code === "not_seen" || code === "not_seen_yet")) return s("no", "Van not seen at the site");
+  if (v.status === "not_confirmed") return s("cant", "Can't check", v.reason ? `Can't check: ${lowerFirst(v.reason)}` : "Can't check the van");
+  if (v.status === "waiting") return past ? s("no", "Van not seen at the site") : s("booked", "", "Booked today");
   return null;
 }
+// The detail on hover and in the job's log: the van, where and when it stopped, and when it left. No distance: a site can
+// have its own radius, which the page isn't told.
 function arrDetail(v) {
-  if (v.status === "not_confirmed") return v.reason || "No arrival was confirmed";
-  if (v.status === "waiting") return "The van hasn't stopped at the site yet";
-  const at = `${v.reg || "The van"} stopped ${v.distance != null ? `${v.distance} m from ${v.postcode || "the site"}` : `at ${v.postcode || "the site"}`} at ${ukClock(v.arrivedAt, true)}`;
+  const past = !!arrivals && v.day < arrivals.today;
+  if (v.status === "waiting") return past ? "No van stop was seen near the site" : "No van stop near the site yet";
+  if (v.status === "not_confirmed") return v.reason || "No van arrival was seen";
+  const at = `${v.reg || "The van"} stopped near the site${v.postcode ? ` (${v.postcode})` : ""} at ${ukClock(v.arrivedAt, true)}`;
   // Trips away and back during the day (lunch, the merchant's), each [left, back].
   const trips = Array.isArray(v.away) ? v.away.filter(p => Array.isArray(p) && p[0] && p[1]).map(([a, b]) => `${ukClock(a)}–${ukClock(b)}`) : [];
   const away = trips.length ? `, was away ${trips.join(" and ")},` : "";
-  return v.leftAt ? `${at}${away} and left at ${ukClock(v.leftAt, true)}` : v.status === "on_site" ? `${at}${away} and is still there` : `${at}${away.replace(/,$/, "")}`;
+  if (v.leftAt) return `${at}${away} and left at ${ukClock(v.leftAt, true)}`;
+  if (v.status === "on_site" && !past) return `${at}${away} and is still there`;
+  return `${at}${away.replace(/,$/, "")}. No leaving time was recorded`;
 }
 // log: whose arrivals a tap shows; the Jobs view passes all of the job's subitems (ids joined with commas).
 function arrChip(day, entry, fitter, log = entry) {
   const v = arrOf(day, entry, fitter), st = arrState(v);
-  if (!st) return "";
-  const detail = arrDetail(v);
-  return `<span class="arr ${st.cls}" role="button" tabindex="0" data-arr="${esc(log)}" title="${esc(detail)}" aria-label="${esc(`${st.text}. ${detail}. Show this job's arrivals`)}">${esc(st.text)}</span>`;
+  if (!st || !st.chip) return "";
+  const more = ["ok", "left", "closed"].includes(st.kind) ? `. ${st.title}` : "";
+  return `<span class="arr ${st.kind}" role="button" tabindex="0" data-arr="${esc(log)}" title="${esc(st.title)}" aria-label="${esc(`${st.line}${more}. Show this job's arrivals`)}">${icon(st.kind === "cant" ? "q" : "van")}${esc(st.chip)}</span>`;
 }
-function arrMini(entry, fitter) {
-  if (!arrivals) return "";
-  const v = arrOf(arrivals.today, entry, fitter), st = arrState(v);
-  return st ? `<span class="t-arr ${st.cls}" title="${esc(arrDetail(v))}">${icon("arrivals")}<span class="sr">Arrival </span>${esc(st.mini)}</span>` : "";
+// What someone booked today on a job (one or more of its subitems) has to show: their van's state today, if there's a visit.
+function arrMini(p) {
+  if (!arrivals) return null;
+  for (const e of p.entries) { const v = arrOf(arrivals.today, e.id, p.label); if (v) return arrState(v); }
+  return null;
 }
 async function loadArrivals() {
   clearTimeout(arrTimer);
@@ -1842,13 +2070,15 @@ async function loadArrivals() {
 }
 function syncArrivalsUI() { document.getElementById("arrivalsBtn").hidden = !arrivals; }
 function arrRow(v, withJob) {
-  const st = arrState(v) || { cls: "", text: "Not arrived yet" };
+  const st = arrState(v) || { kind: "booked", line: "Booked today", title: "" };
   const who = `${esc(v.name || parseLabel(v.fitter).name)}${v.reg ? ` · ${esc(v.reg)}` : ""}`;
   const job = [v.wfm ? `WFM ${esc(v.wfm)}` : "", esc(v.postcode || "")].filter(Boolean).join(" · ");
+  // The detail (where, when, trips away) only where the van was seen; otherwise the line says it all
+  const detail = ["ok", "left", "closed"].includes(st.kind) ? `<span class="x">${esc(st.title)}</span>` : "";
   return withJob
-    ? `<button type="button" class="arow" data-arr-open="${esc(v.entry)}"><i class="dot ${st.cls}" aria-hidden="true"></i><b>${who}</b>
-        <span class="j">${esc(v.entryName || v.jobName || "Job")}${job ? ` · ${job}` : ""}</span><span class="s ${st.cls}">${esc(st.text)}</span></button>`
-    : `<div class="arow static"><i class="dot ${st.cls}" aria-hidden="true"></i><b>${who}</b><span class="s ${st.cls}">${esc(st.text)}</span><span class="x">${esc(arrDetail(v))}</span></div>`;
+    ? `<button type="button" class="arow" data-arr-open="${esc(v.entry)}"><i class="dot ${st.kind}" aria-hidden="true"></i><b>${who}</b>
+        <span class="j">${esc(v.entryName || v.jobName || "Job")}${job ? ` · ${job}` : ""}</span><span class="s ${st.kind}">${esc(st.line)}</span></button>`
+    : `<div class="arow static"><i class="dot ${st.kind}" aria-hidden="true"></i><b>${who}</b><span class="s ${st.kind}">${esc(st.line)}</span>${detail}</div>`;
 }
 const arrDayTitle = d => d === arrivals.today ? "Today" : fullDate(d);
 function arrivalsList() {
@@ -1867,7 +2097,7 @@ function openArrivals() {
   const checked = arrivals.checkedAt ? `Checked every 2 minutes · last check ${ukClock(arrivals.checkedAt)}` : "Checked every 2 minutes";
   sheetUI.show(`<header class="dlg-head"><h2 id="sheetTitle">Arrivals</h2><button class="close" type="button" data-act="sheet-close" aria-label="Close arrivals">${icon("close")}</button></header>
     <div class="dlg-body">
-      <div><p class="lede">When each fitter's van reached the site, over the last 30 days, from FleetView.</p>
+      <div><p class="lede">When each fitter's van reached the site and left it, over the last 30 days, from FleetView. Van times show the van, not who was in it.</p>
         <p class="arr-meta">${esc(checked)}${arrivals.problem ? ` · ${esc(arrivals.problem)}` : ""}</p></div>
       <input class="input search" id="arrSearch" type="search" placeholder="Search fitter, job, WFM or postcode" value="${esc(arrSearch)}" aria-label="Search arrivals" autocomplete="off">
       <div id="arrList" style="display:flex;flex-direction:column;gap:18px">${arrivalsList()}</div>
@@ -1949,6 +2179,8 @@ document.addEventListener("click", ev => {
   if (ev.target.closest("#arrBack")) { openArrivals(); return; }
   const jt = ev.target.closest(".jrow[aria-controls]");
   if (jt) { toggleJob(jt); return; }
+  const fh = ev.target.closest(".jfold-head");
+  if (fh) { toggleFold(fh); return; }
   const eh = ev.target.closest(".early-head");
   if (eh) { toggleEarly(eh); return; }
   const el = ev.target.closest("[data-act]");

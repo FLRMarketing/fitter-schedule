@@ -1,7 +1,7 @@
 {
   "name": "FLR Fitter Schedule",
   "short_name": "Fitters",
-  "description": "Who's free, who's working and which jobs need a fitter over the next two weeks.",
+  "description": "Who's free, who's working and which jobs need a fitter, 30 days either side of today.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
