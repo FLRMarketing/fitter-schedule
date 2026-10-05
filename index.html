@@ -445,7 +445,12 @@ img.avatar{object-fit:cover;background:var(--ph-bg)}
 .dg-head.stuck::before{opacity:1;-webkit-backdrop-filter:var(--blur);backdrop-filter:var(--blur)}
 .dg-head h2{font:600 17px/1.3 var(--font-display);letter-spacing:-.016em}
 /* Today's jobs in two lists: those with someone (or a gap to fill) booked today, then those running with nobody on today */
-.dg-sub{margin:4px 4px 8px;font:600 13.5px/1.3 var(--font-text);letter-spacing:-.003em;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.dg-sub{margin:4px 4px 8px;font:600 13.5px/1.3 var(--font-text);letter-spacing:-.003em;color:var(--ink-2);font-variant-numeric:tabular-nums;
+  scroll-margin-top:calc(env(safe-area-inset-top,0px) + var(--nav-h) + 52px)}
+/* Today's two lists add up to the Today count: said under the date when there are two, as only the first shows at first */
+.dg-note{margin:0 4px 10px;font-size:13px;line-height:1.4;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.dg-note .linkbtn{padding:0;font-weight:600}
+.dg-sub:focus{outline:none}
 .dgroup .group+.dg-sub{margin-top:20px}
 .jcard{position:relative}
 .jcard+.jcard::before{content:"";position:absolute;z-index:1;top:0;left:16px;right:0;height:var(--hair);background:var(--sep)}
@@ -1685,9 +1690,11 @@ function renderJobsBody() {
   }
   if (now.length) {
     const on = now.filter(j => j.today.length), idle = now.filter(j => !j.today.length), n = c => `${c} ${c === 1 ? "job" : "jobs"}`;
-    html += `<section class="dgroup today">${head(TODAY, `<span class="tag today">Today</span>`)}
+    // The Today count is every job in progress today, both lists; with two, say so before the first.
+    const both = on.length && idle.length ? `<p class="dg-note">${n(now.length)} in progress today: ${on.length} on today and <button type="button" class="linkbtn" data-act="to-idle">${idle.length} with nobody booked today</button>.</p>` : "";
+    html += `<section class="dgroup today">${head(TODAY, `<span class="tag today">Today</span>`)}${both}
       ${on.length ? `<h3 class="dg-sub">On today · ${n(on.length)}</h3>${cards(on, "today")}` : ""}
-      ${idle.length ? `<h3 class="dg-sub">In progress, nobody booked today · ${n(idle.length)}</h3>${cards(idle, "today")}` : ""}
+      ${idle.length ? `<h3 class="dg-sub" id="jobsIdle" tabindex="-1">In progress, nobody booked today · ${n(idle.length)}</h3>${cards(idle, "today")}` : ""}
     </section>`;
   }
   html += byDay(ahead, j => j.from).sort((a, b) => a[0].localeCompare(b[0]))
@@ -2191,6 +2198,7 @@ document.addEventListener("click", ev => {
     case "key": openSheet("key"); break;
     case "needs": showNeeds(); break;
     case "today": selectDay(TODAY); break;
+    case "to-idle": { const h = document.getElementById("jobsIdle"); if (h) { h.scrollIntoView({ block: "start", behavior: FLRUI.reduced() ? "auto" : "smooth" }); h.focus({ preventScroll: true }); } break; }
     case "strip-prev": scrollStrip(-1); break;
     case "strip-next": scrollStrip(1); break;
     default: break;
