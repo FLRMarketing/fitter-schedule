@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="/flr-hub/tool-transition.css">
 <script>addEventListener("pagereveal", e => { const t = e.viewTransition; if (t) { t.ready.catch(() => {}); t.finished.catch(() => {}); t.updateCallbackDone.catch(() => {}); } });</script>
 <!-- The FLR Hub's assistant, Likkle Jeff (same site): help in the corner, as on the Hub's own pages -->
-<script type="module" src="/flr-hub/assistant/assistant.js?v=2.1"></script>
+<script type="module" src="/flr-hub/assistant/assistant.js?v=2.2"></script>
 <style>
 /* ============================================================================
    FLR Fitter Schedule in the FLR Hub's look, shared with the Fleet report and
@@ -1990,7 +1990,7 @@ function reasonOf(v) {
 }
 // What couldn't be checked: [on a chip, in full]; null in full means the database's own words.
 const CANT_CHECK = {
-  no_van: ["no van on his label", "no FLR van on his Work Programme label"],
+  no_van: ["no van on their label", "no FLR van on their Work Programme label"],
   van_not_in_fleetview: ["van not in FleetView", null],
   van_someone_elses: ["van down as someone else's", null],
   no_postcode: ["no site postcode", "no site postcode on the Work Programme"],
