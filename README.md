@@ -1,3 +1,5 @@
+**Moved (26 Nov 2026):** the Fitter Schedule now lives in the FLR Hub at https://hub.flr.co.uk/fitter-schedule/ (repository FLR-Group/flr-hub, folder `fitter-schedule/`), so it shares the Hub's sign-in. This page only forwards old links and bookmarks there.
+
 # FLR Fitter Schedule
 
 A mobile-first web app, in the same look as the [FLR Hub](https://flrmarketing.github.io/flr-hub/) (which links to it), that shows, for each day from 30 days ago to 30 days ahead (the window moves on by itself every day), which fitters are **free**, **working** or **off**, what each is working on, and which jobs on the Work Programme still **need a fitter**. It reads the Monday.com *Work Programme* board (ID 5094652880) through a small Cloudflare Worker, so no Monday token ever reaches a phone.
